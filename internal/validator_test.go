@@ -90,6 +90,26 @@ func TestValidator_digitValidate(t *testing.T) {
 	}
 }
 
+func TestValidator_patternValidate(t *testing.T) {
+	cases := []struct {
+		annotation string
+		value      string
+		argument   string
+		expected   string
+	}{
+		{"valid1", "example-value", `^[\w+=,.@-]+$`, ""},
+		{"valid2", "valid+=,.@-", `^[\w+=,.@-]+$`, ""},
+		{"invalid", "invalid+=,.@-<>", `^[\w+=,.@-]+$`, "must be in a valid format"},
+	}
+
+	for _, tc := range cases {
+		sut := newValidatorSut(tc.value)
+		sut.pattern = tc.argument
+		sut.patternValidate()
+		assert(t, tc.expected, sut.Errors, tc.value, tc.argument)
+	}
+}
+
 func assert(t *testing.T, expected string, actual *Errors, value string, argument string) {
 	if expected == "" {
 		assertNoError(t, actual, value, argument)
