@@ -72,6 +72,28 @@ func TestValidator_maxLengthValidate(t *testing.T) {
 	}
 }
 
+func TestValidator_notEmptyValidate(t *testing.T) {
+	cases := []struct {
+		annotation string
+		value      string
+		expected   string
+	}{
+		{"valid1", "abc", ""},
+		{"valid2", "0", ""},
+		{"valid3", "false", ""},
+		{"valid4", "null", ""},
+		{"valid5", " ", ""},
+		{"invalid", "", "cannot be blank"},
+	}
+
+	for _, tc := range cases {
+		sut := newValidatorSut(tc.value)
+		sut.notEmpty = true
+		sut.notEmptyValidate()
+		assert(t, tc.expected, sut.Errors, tc.value, NoArgument)
+	}
+}
+
 func TestValidator_digitValidate(t *testing.T) {
 	cases := []struct {
 		annotation string
