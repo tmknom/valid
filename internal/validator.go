@@ -24,6 +24,7 @@ type Validator struct {
 	maxLength     string
 	digit         bool
 	alpha         bool
+	alphanumeric  bool
 	pattern       string
 }
 
@@ -33,6 +34,7 @@ func (v *Validator) validate() error {
 	v.maxLengthValidate()
 	v.digitValidate()
 	v.alphaValidate()
+	v.alphanumericValidate()
 	v.patternValidate()
 
 	if !v.HasError() {
@@ -80,6 +82,13 @@ func (v *Validator) alphaValidate() {
 		return
 	}
 	v.wrapValidate(is.Alpha)
+}
+
+func (v *Validator) alphanumericValidate() {
+	if !v.alphanumeric {
+		return
+	}
+	v.wrapValidate(is.Alphanumeric)
 }
 
 func (v *Validator) patternValidate() {
