@@ -19,11 +19,13 @@ type Validator struct {
 
 	exactlyLength string
 	minLength     string
+	maxLength     string
 }
 
 func (v *Validator) validate() error {
 	v.exactlyLengthValidate()
 	v.minLengthValidate()
+	v.maxLengthValidate()
 
 	if !v.HasError() {
 		return nil
@@ -46,6 +48,15 @@ func (v *Validator) minLengthValidate() {
 	}
 	if number, ok := v.toInt(v.minLength); ok {
 		v.wrapValidate(validation.Length(number, 0))
+	}
+}
+
+func (v *Validator) maxLengthValidate() {
+	if v.maxLength == "" {
+		return
+	}
+	if number, ok := v.toInt(v.maxLength); ok {
+		v.wrapValidate(validation.Length(0, number))
 	}
 }
 
