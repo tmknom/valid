@@ -32,6 +32,26 @@ func TestValidator_exactlyLengthValidate(t *testing.T) {
 	}
 }
 
+func TestValidator_minLengthValidate(t *testing.T) {
+	cases := []struct {
+		annotation string
+		value      string
+		argument   string
+		expected   string
+	}{
+		{"valid1", "12345", "5", ""},
+		{"valid2", "12345", "4", ""},
+		{"boundary", "12345", "6", "the length must be no less than 6"},
+	}
+
+	for _, tc := range cases {
+		sut := newValidatorSut(tc.value)
+		sut.minLength = tc.argument
+		sut.minLengthValidate()
+		assert(t, tc.expected, sut.Errors, tc.value, tc.argument)
+	}
+}
+
 func assert(t *testing.T, expected string, actual *Errors, value string, argument string) {
 	if expected == "" {
 		assertNoError(t, actual, value, argument)
