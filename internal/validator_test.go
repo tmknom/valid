@@ -72,6 +72,24 @@ func TestValidator_maxLengthValidate(t *testing.T) {
 	}
 }
 
+func TestValidator_digitValidate(t *testing.T) {
+	cases := []struct {
+		annotation string
+		value      string
+		expected   string
+	}{
+		{"valid", "12345", ""},
+		{"invalid", "abc12", "must contain digits only"},
+	}
+
+	for _, tc := range cases {
+		sut := newValidatorSut(tc.value)
+		sut.digit = true
+		sut.digitValidate()
+		assert(t, tc.expected, sut.Errors, tc.value, NoArgument)
+	}
+}
+
 func assert(t *testing.T, expected string, actual *Errors, value string, argument string) {
 	if expected == "" {
 		assertNoError(t, actual, value, argument)
@@ -99,3 +117,4 @@ func formatMessage(expected string, actual any, value string, argument string) s
 }
 
 const NoError = "<no error>"
+const NoArgument = "<n/a>"

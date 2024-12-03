@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	validation "github.com/go-ozzo/ozzo-validation/v4"
+	"github.com/go-ozzo/ozzo-validation/v4/is"
 )
 
 func newValidator() *Validator {
@@ -20,12 +21,14 @@ type Validator struct {
 	exactlyLength string
 	minLength     string
 	maxLength     string
+	digit         bool
 }
 
 func (v *Validator) validate() error {
 	v.exactlyLengthValidate()
 	v.minLengthValidate()
 	v.maxLengthValidate()
+	v.digitValidate()
 
 	if !v.HasError() {
 		return nil
@@ -58,6 +61,13 @@ func (v *Validator) maxLengthValidate() {
 	if number, ok := v.toInt(v.maxLength); ok {
 		v.wrapValidate(validation.Length(0, number))
 	}
+}
+
+func (v *Validator) digitValidate() {
+	if !v.digit {
+		return
+	}
+	v.wrapValidate(is.Digit)
 }
 
 func (v *Validator) wrapValidate(rules ...validation.Rule) {
