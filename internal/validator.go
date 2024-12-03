@@ -2,6 +2,7 @@ package internal
 
 import (
 	"fmt"
+	"regexp"
 	"strconv"
 
 	validation "github.com/go-ozzo/ozzo-validation/v4"
@@ -22,6 +23,7 @@ type Validator struct {
 	minLength     string
 	maxLength     string
 	digit         bool
+	pattern       string
 }
 
 func (v *Validator) validate() error {
@@ -29,6 +31,7 @@ func (v *Validator) validate() error {
 	v.minLengthValidate()
 	v.maxLengthValidate()
 	v.digitValidate()
+	v.patternValidate()
 
 	if !v.HasError() {
 		return nil
@@ -68,6 +71,19 @@ func (v *Validator) digitValidate() {
 		return
 	}
 	v.wrapValidate(is.Digit)
+}
+
+func (v *Validator) patternValidate() {
+	if v.pattern == "" {
+		return
+	}
+
+	regex, err := regexp.Compile(v.pattern)
+	if err != nil {
+		v.AddArgumentError(err)
+		return
+	}
+	v.wrapValidate(validation.Match(regex))
 }
 
 func (v *Validator) wrapValidate(rules ...validation.Rule) {
