@@ -34,6 +34,10 @@ build: deps ## build executable binary
 install: deps ## install
 	go install -ldflags=$(LDFLAGS) ./cmd/$(REPO_NAME)
 
+.PHONY: run
+run: build ## run command
+	bin/$(REPO_NAME) --help
+
 .PHONY: test
 test: lint ## test
 	go test ./...
