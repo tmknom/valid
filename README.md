@@ -1,10 +1,10 @@
-# template
+# valid
 
-The template repository.
+A CLI tool for validating input values.
 
 ## Description
 
-Template repository for developing with GitHub.
+`valid` uses flags to set validation rules and check if the value is valid.
 
 ## Usage
 
