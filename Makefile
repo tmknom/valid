@@ -36,7 +36,8 @@ install: deps ## install
 
 .PHONY: run
 run: build ## run command
-	bin/$(REPO_NAME) --help
+	bin/$(REPO_NAME) --exactly-length "a" --digit --value "12345678901a" || true
+	VALID_DEBUG=true bin/$(REPO_NAME) --min-length "1" --max-length "12" --pattern '^[\w+=,.@-]+$$' --value 'example-iam-role+=,.@-<>' || true
 
 .PHONY: test
 test: lint ## test
