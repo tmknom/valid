@@ -192,6 +192,27 @@ func TestValidator_printableASCIIValidate(t *testing.T) {
 	}
 }
 
+func TestValidator_intValidate(t *testing.T) {
+	cases := []struct {
+		annotation string
+		value      string
+		expected   string
+	}{
+		{"valid1", "12345", ""},
+		{"valid2", "+12345", ""},
+		{"valid3", "-12345", ""},
+		{"invalid1", "abc123", "must be an integer number"},
+		{"invalid2", "1.2", "must be an integer number"},
+	}
+
+	for _, tc := range cases {
+		sut := newValidatorSut(tc.value)
+		sut.int = true
+		sut.intValidate()
+		assert(t, tc.expected, sut.Errors, tc.value, NoArgument)
+	}
+}
+
 func TestValidator_patternValidate(t *testing.T) {
 	cases := []struct {
 		annotation string
