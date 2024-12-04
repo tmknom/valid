@@ -148,6 +148,28 @@ func TestValidator_alphanumericValidate(t *testing.T) {
 	}
 }
 
+func TestValidator_asciiValidate(t *testing.T) {
+	cases := []struct {
+		annotation string
+		value      string
+		expected   string
+	}{
+		{"valid1", "abcABC123<>", ""},
+		{"valid2", "'newline\r\ntab\t'", ""},
+		{"valid3", "'\x00 ASCII \x7F'", ""},
+		{"valid4", "'\x20 printable ASCII \x7E'", ""},
+		{"valid5", "'\x19 not printable ASCII \x7F'", ""},
+		{"invalid", "abcABC123<>あ", "must contain ASCII characters only"},
+	}
+
+	for _, tc := range cases {
+		sut := newValidatorSut(tc.value)
+		sut.ascii = true
+		sut.asciiValidate()
+		assert(t, tc.expected, sut.Errors, tc.value, NoArgument)
+	}
+}
+
 func TestValidator_patternValidate(t *testing.T) {
 	cases := []struct {
 		annotation string
