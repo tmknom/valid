@@ -74,6 +74,7 @@ func (v *Validator) minValidate() {
 		condition, err2 := strconv.ParseInt(v.min, 10, 64)
 		if err2 != nil {
 			v.AddArgumentError(fmt.Errorf("invalid min: %s", v.min))
+			return
 		}
 		v.wrapAnyValidate(value, validation.Min(condition))
 		return
@@ -83,6 +84,7 @@ func (v *Validator) minValidate() {
 		condition, err2 := strconv.ParseFloat(v.min, 64)
 		if err2 != nil {
 			v.AddArgumentError(fmt.Errorf("invalid min: %s", v.min))
+			return
 		}
 		v.wrapAnyValidate(value, validation.Min(condition))
 		return
