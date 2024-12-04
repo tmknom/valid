@@ -213,6 +213,25 @@ func TestValidator_intValidate(t *testing.T) {
 	}
 }
 
+func TestValidator_floatValidate(t *testing.T) {
+	cases := []struct {
+		annotation string
+		value      string
+		expected   string
+	}{
+		{"valid1", "12.345", ""},
+		{"valid2", "12345", ""},
+		{"invalid", "abc123", "must be a floating point number"},
+	}
+
+	for _, tc := range cases {
+		sut := newValidatorSut(tc.value)
+		sut.float = true
+		sut.floatValidate()
+		assert(t, tc.expected, sut.Errors, tc.value, NoArgument)
+	}
+}
+
 func TestValidator_patternValidate(t *testing.T) {
 	cases := []struct {
 		annotation string
