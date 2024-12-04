@@ -19,15 +19,16 @@ type Validator struct {
 	value string
 	*Errors
 
-	exactlyLength string
-	minLength     string
-	maxLength     string
-	notEmpty      bool
-	digit         bool
-	alpha         bool
-	alphanumeric  bool
-	ascii         bool
-	pattern       string
+	exactlyLength  string
+	minLength      string
+	maxLength      string
+	notEmpty       bool
+	digit          bool
+	alpha          bool
+	alphanumeric   bool
+	ascii          bool
+	printableASCII bool
+	pattern        string
 }
 
 func (v *Validator) validate() error {
@@ -39,6 +40,7 @@ func (v *Validator) validate() error {
 	v.alphaValidate()
 	v.alphanumericValidate()
 	v.asciiValidate()
+	v.printableASCIIValidate()
 	v.patternValidate()
 
 	if !v.HasError() {
@@ -107,6 +109,13 @@ func (v *Validator) asciiValidate() {
 		return
 	}
 	v.wrapValidate(is.ASCII)
+}
+
+func (v *Validator) printableASCIIValidate() {
+	if !v.printableASCII {
+		return
+	}
+	v.wrapValidate(is.PrintableASCII)
 }
 
 func (v *Validator) patternValidate() {
