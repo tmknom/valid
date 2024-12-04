@@ -28,6 +28,7 @@ type Validator struct {
 	alphanumeric   bool
 	ascii          bool
 	printableASCII bool
+	int            bool
 	pattern        string
 }
 
@@ -41,6 +42,7 @@ func (v *Validator) validate() error {
 	v.alphanumericValidate()
 	v.asciiValidate()
 	v.printableASCIIValidate()
+	v.intValidate()
 	v.patternValidate()
 
 	if !v.HasError() {
@@ -116,6 +118,13 @@ func (v *Validator) printableASCIIValidate() {
 		return
 	}
 	v.wrapValidate(is.PrintableASCII)
+}
+
+func (v *Validator) intValidate() {
+	if !v.int {
+		return
+	}
+	v.wrapValidate(is.Int)
 }
 
 func (v *Validator) patternValidate() {
