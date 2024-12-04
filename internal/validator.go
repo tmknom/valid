@@ -22,6 +22,7 @@ type Validator struct {
 	exactlyLength string
 	minLength     string
 	maxLength     string
+	notEmpty      bool
 	digit         bool
 	alpha         bool
 	alphanumeric  bool
@@ -32,6 +33,7 @@ func (v *Validator) validate() error {
 	v.exactlyLengthValidate()
 	v.minLengthValidate()
 	v.maxLengthValidate()
+	v.notEmptyValidate()
 	v.digitValidate()
 	v.alphaValidate()
 	v.alphanumericValidate()
@@ -68,6 +70,13 @@ func (v *Validator) maxLengthValidate() {
 	if number, ok := v.toInt(v.maxLength); ok {
 		v.wrapValidate(validation.Length(0, number))
 	}
+}
+
+func (v *Validator) notEmptyValidate() {
+	if !v.notEmpty {
+		return
+	}
+	v.wrapValidate(validation.Required)
 }
 
 func (v *Validator) digitValidate() {

@@ -54,6 +54,7 @@ func (a *App) Run(ctx context.Context, args []string) error {
 	a.rootCmd.Flags().StringVar(&validator.exactlyLength, "exactly-length", "", "checks if the length matches exactly")
 	a.rootCmd.Flags().StringVar(&validator.minLength, "min-length", "", "checks if the length is greater than or equal to the specified minimum")
 	a.rootCmd.Flags().StringVar(&validator.maxLength, "max-length", "", "checks if the length is less than or equal to the specified maximum")
+	a.rootCmd.Flags().BoolVar(&validator.notEmpty, "not-empty", false, "checks if the value is not empty")
 	a.rootCmd.Flags().BoolVar(&validator.digit, "digit", false, "checks if the value contains only digits (0-9)")
 	a.rootCmd.Flags().BoolVar(&validator.alpha, "alpha", false, "checks if the value contains only English letters (a-zA-Z)")
 	a.rootCmd.Flags().BoolVar(&validator.alphanumeric, "alphanumeric", false, "checks if the value contains only English letters and digits (a-zA-Z0-9)")
