@@ -108,6 +108,24 @@ func TestValidator_alphaValidate(t *testing.T) {
 	}
 }
 
+func TestValidator_alphanumericValidate(t *testing.T) {
+	cases := []struct {
+		annotation string
+		value      string
+		expected   string
+	}{
+		{"valid", "abcABC123", ""},
+		{"invalid", "abcABC123<>", "must contain English letters and digits only"},
+	}
+
+	for _, tc := range cases {
+		sut := newValidatorSut(tc.value)
+		sut.alphanumeric = true
+		sut.alphanumericValidate()
+		assert(t, tc.expected, sut.Errors, tc.value, NoArgument)
+	}
+}
+
 func TestValidator_patternValidate(t *testing.T) {
 	cases := []struct {
 		annotation string
