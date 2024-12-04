@@ -170,6 +170,28 @@ func TestValidator_asciiValidate(t *testing.T) {
 	}
 }
 
+func TestValidator_printableASCIIValidate(t *testing.T) {
+	cases := []struct {
+		annotation string
+		value      string
+		expected   string
+	}{
+		{"valid1", "abcABC123<>", ""},
+		{"valid2", "'\x20 printable ASCII \x7E'", ""},
+		{"invalid1", "abcABC123<>あ", "must contain printable ASCII characters only"},
+		{"invalid2", "'newline\r\ntab\t'", "must contain printable ASCII characters only"},
+		{"invalid3", "'\x00 ASCII \x7F'", "must contain printable ASCII characters only"},
+		{"invalid4", "'\x19 not printable ASCII \x7F'", "must contain printable ASCII characters only"},
+	}
+
+	for _, tc := range cases {
+		sut := newValidatorSut(tc.value)
+		sut.printableASCII = true
+		sut.printableASCIIValidate()
+		assert(t, tc.expected, sut.Errors, tc.value, NoArgument)
+	}
+}
+
 func TestValidator_patternValidate(t *testing.T) {
 	cases := []struct {
 		annotation string
