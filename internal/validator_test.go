@@ -12,6 +12,36 @@ func newValidatorSut(value string) *Validator {
 	}
 }
 
+func TestValidator_minValidate(t *testing.T) {
+	cases := []struct {
+		annotation string
+		value      string
+		argument   string
+		expected   string
+	}{
+		{"valid1", "10", "9", ""},
+		{"valid2", "9", "9", ""},
+		{"valid3", "-1", "-1", ""},
+		{"valid4", "1.2", "1.1", ""},
+		{"valid5", "1.1", "1.1", ""},
+		{"valid6", "-1.1", "-1.1", ""},
+		{"invalid1", "8", "9", "must be no less than 9"},
+		{"invalid2", "-2", "-1", "must be no less than -1"},
+		{"invalid3", "8.1", "9.1", "must be no less than 9.1"},
+		{"invalid4", "-2.1", "-1.1", "must be no less than -1.1"},
+		{"invalid5", "1", "a", "invalid min: a"},
+		{"invalid6", "1.1", "a", "invalid min: a"},
+		{"invalid7", "a", "9", "string is not supported: a"},
+	}
+
+	for _, tc := range cases {
+		sut := newValidatorSut(tc.value)
+		sut.min = tc.argument
+		sut.minValidate()
+		assert(t, tc.expected, sut.Errors, tc.value, tc.argument)
+	}
+}
+
 func TestValidator_exactlyLengthValidate(t *testing.T) {
 	cases := []struct {
 		annotation string
