@@ -61,6 +61,7 @@ func (a *App) Run(ctx context.Context, args []string) error {
 	a.rootCmd.Flags().BoolVar(&validator.ascii, "ascii", false, "checks if the value contains only ASCII characters")
 	a.rootCmd.Flags().BoolVar(&validator.printableASCII, "printable-ascii", false, "checks if the value contains only printable ASCII characters")
 	a.rootCmd.Flags().BoolVar(&validator.int, "int", false, "checks if the value is an integer")
+	a.rootCmd.Flags().BoolVar(&validator.float, "float", false, "checks if the value is a floating-point number")
 	a.rootCmd.Flags().StringVar(&validator.pattern, "pattern", "", "checks if the value matches the specified regular expression")
 
 	a.rootCmd.RunE = func(cmd *cobra.Command, args []string) error { return validator.validate() }
