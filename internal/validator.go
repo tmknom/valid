@@ -21,6 +21,7 @@ type Validator struct {
 	*Errors
 
 	min            string
+	max            string
 	exactlyLength  string
 	minLength      string
 	maxLength      string
@@ -37,6 +38,7 @@ type Validator struct {
 
 func (v *Validator) validate() error {
 	v.minValidate()
+	v.maxValidate()
 	v.exactlyLengthValidate()
 	v.minLengthValidate()
 	v.maxLengthValidate()
@@ -76,6 +78,34 @@ func (v *Validator) minValidate() {
 			v.AddArgumentError(fmt.Errorf("invalid min: %s", v.min))
 		}
 		v.wrapAnyValidate(value, validation.Min(condition))
+		return
+	}
+
+	v.AddValidationError(fmt.Errorf("%s is not supported: %s", reflect.ValueOf(v.value).Type(), v.value))
+}
+
+func (v *Validator) maxValidate() {
+	if v.max == "" {
+		return
+	}
+
+	if value, err1 := strconv.ParseInt(v.value, 10, 64); err1 == nil {
+		condition, err2 := strconv.ParseInt(v.max, 10, 64)
+		if err2 != nil {
+			v.AddArgumentError(fmt.Errorf("invalid max: %s", v.max))
+			return
+		}
+		v.wrapAnyValidate(value, validation.Max(condition))
+		return
+	}
+
+	if value, err1 := strconv.ParseFloat(v.value, 64); err1 == nil {
+		condition, err2 := strconv.ParseFloat(v.max, 64)
+		if err2 != nil {
+			v.AddArgumentError(fmt.Errorf("invalid max: %s", v.max))
+			return
+		}
+		v.wrapAnyValidate(value, validation.Max(condition))
 		return
 	}
 
