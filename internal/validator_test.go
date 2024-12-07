@@ -312,6 +312,26 @@ func TestValidator_patternValidate(t *testing.T) {
 	}
 }
 
+func TestValidator_enumValidate(t *testing.T) {
+	cases := []struct {
+		annotation string
+		value      string
+		argument   string
+		expected   string
+	}{
+		{"valid1", "bar", "foo,bar,baz", ""},
+		{"valid2", "foo", "foo", ""},
+		{"invalid", "invalid", "foo,bar,baz", "must be a valid value: [foo bar baz]"},
+	}
+
+	for _, tc := range cases {
+		sut := newValidatorSut(tc.value)
+		sut.enum = tc.argument
+		sut.enumValidate()
+		assert(t, tc.expected, sut.Errors, tc.value, tc.argument)
+	}
+}
+
 func assert(t *testing.T, expected string, actual *Errors, value string, argument string) {
 	if expected == "" {
 		assertNoError(t, actual, value, argument)

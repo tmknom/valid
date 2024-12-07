@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"reflect"
 	"regexp"
+	"slices"
 	"strconv"
+	"strings"
 
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/go-ozzo/ozzo-validation/v4/is"
@@ -34,6 +36,7 @@ type Validator struct {
 	int            bool
 	float          bool
 	pattern        string
+	enum           string
 }
 
 func (v *Validator) validate() error {
@@ -51,6 +54,7 @@ func (v *Validator) validate() error {
 	v.intValidate()
 	v.floatValidate()
 	v.patternValidate()
+	v.enumValidate()
 
 	if !v.HasError() {
 		return nil
@@ -206,6 +210,17 @@ func (v *Validator) patternValidate() {
 		return
 	}
 	v.wrapValidate(validation.Match(regex))
+}
+
+func (v *Validator) enumValidate() {
+	if v.enum == "" {
+		return
+	}
+
+	enumerations := strings.Split(v.enum, ",")
+	if !slices.Contains(enumerations, v.value) {
+		v.AddValidationError(fmt.Errorf("must be a valid value: %v", enumerations))
+	}
 }
 
 func (v *Validator) wrapValidate(rules ...validation.Rule) {
