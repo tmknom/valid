@@ -292,6 +292,25 @@ func TestValidator_floatValidate(t *testing.T) {
 	}
 }
 
+func TestValidator_urlValidate(t *testing.T) {
+	cases := []struct {
+		annotation string
+		value      string
+		expected   string
+	}{
+		{"valid1", "https://example.com", ""},
+		{"valid2", "https://localhost:8080/test.html", ""},
+		{"invalid", "example.com", "must be a valid request URL"},
+	}
+
+	for _, tc := range cases {
+		sut := newValidatorSut(tc.value)
+		sut.url = true
+		sut.urlValidate()
+		assert(t, tc.expected, sut.Errors, tc.value, NoArgument)
+	}
+}
+
 func TestValidator_patternValidate(t *testing.T) {
 	cases := []struct {
 		annotation string

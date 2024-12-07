@@ -36,6 +36,7 @@ type Validator struct {
 	printableASCII bool
 	int            bool
 	float          bool
+	url            bool
 	pattern        string
 	enum           string
 	timestamp      string
@@ -55,6 +56,7 @@ func (v *Validator) validate() error {
 	v.printableASCIIValidate()
 	v.intValidate()
 	v.floatValidate()
+	v.urlValidate()
 	v.patternValidate()
 	v.enumValidate()
 	v.timestampValidate()
@@ -202,6 +204,13 @@ func (v *Validator) floatValidate() {
 		return
 	}
 	v.wrapValidate(is.Float)
+}
+
+func (v *Validator) urlValidate() {
+	if !v.url {
+		return
+	}
+	v.wrapValidate(is.RequestURL)
 }
 
 func (v *Validator) patternValidate() {
