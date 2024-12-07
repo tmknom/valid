@@ -64,6 +64,7 @@ func (a *App) Run(ctx context.Context, args []string) error {
 	a.rootCmd.Flags().BoolVar(&validator.printableASCII, "printable-ascii", false, "checks if the value contains only printable ASCII characters")
 	a.rootCmd.Flags().BoolVar(&validator.int, "int", false, "checks if the value is an integer")
 	a.rootCmd.Flags().BoolVar(&validator.float, "float", false, "checks if the value is a floating-point number")
+	a.rootCmd.Flags().BoolVar(&validator.url, "url", false, "checks if the value is a valid URL")
 	a.rootCmd.Flags().StringVar(&validator.pattern, "pattern", "", "checks if the value matches the specified regular expression")
 	a.rootCmd.Flags().StringVar(&validator.enum, "enum", "", "checks if the value can be found in the given enumerations")
 	a.rootCmd.Flags().StringVar(&validator.timestamp, "timestamp", "", "checks if the value is a timestamp whose format is specified by the layout [rfc3339,datetime,date,time]")
