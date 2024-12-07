@@ -368,6 +368,24 @@ func TestValidator_base64Validate(t *testing.T) {
 	}
 }
 
+func TestValidator_jsonValidate(t *testing.T) {
+	cases := []struct {
+		annotation string
+		value      string
+		expected   string
+	}{
+		{"valid", "[1, 2]", ""},
+		{"invalid", "[1, 2,]", "must be in valid JSON format"},
+	}
+
+	for _, tc := range cases {
+		sut := newValidatorSut(tc.value)
+		sut.json = true
+		sut.jsonValidate()
+		assert(t, tc.expected, sut.Errors, tc.value, NoArgument)
+	}
+}
+
 func TestValidator_patternValidate(t *testing.T) {
 	cases := []struct {
 		annotation string
