@@ -330,6 +330,26 @@ func TestValidator_emailValidate(t *testing.T) {
 	}
 }
 
+func TestValidator_semverValidate(t *testing.T) {
+	cases := []struct {
+		annotation string
+		value      string
+		expected   string
+	}{
+		{"valid1", "1.2.3", ""},
+		{"valid2", "v1.2.3", ""},
+		{"valid3", "v1.2.3-beta", ""},
+		{"invalid", "1.2", "must be a valid semantic version"},
+	}
+
+	for _, tc := range cases {
+		sut := newValidatorSut(tc.value)
+		sut.semver = true
+		sut.semverValidate()
+		assert(t, tc.expected, sut.Errors, tc.value, NoArgument)
+	}
+}
+
 func TestValidator_patternValidate(t *testing.T) {
 	cases := []struct {
 		annotation string
