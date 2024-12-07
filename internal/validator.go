@@ -37,6 +37,7 @@ type Validator struct {
 	int            bool
 	float          bool
 	url            bool
+	email          bool
 	pattern        string
 	enum           string
 	timestamp      string
@@ -57,6 +58,7 @@ func (v *Validator) validate() error {
 	v.intValidate()
 	v.floatValidate()
 	v.urlValidate()
+	v.emailValidate()
 	v.patternValidate()
 	v.enumValidate()
 	v.timestampValidate()
@@ -211,6 +213,13 @@ func (v *Validator) urlValidate() {
 		return
 	}
 	v.wrapValidate(is.RequestURL)
+}
+
+func (v *Validator) emailValidate() {
+	if !v.email {
+		return
+	}
+	v.wrapValidate(is.EmailFormat)
 }
 
 func (v *Validator) patternValidate() {
