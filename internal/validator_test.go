@@ -350,6 +350,24 @@ func TestValidator_semverValidate(t *testing.T) {
 	}
 }
 
+func TestValidator_base64Validate(t *testing.T) {
+	cases := []struct {
+		annotation string
+		value      string
+		expected   string
+	}{
+		{"valid", "dmFsaWQ=", ""},
+		{"invalid", "invalid", "must be encoded in Base64"},
+	}
+
+	for _, tc := range cases {
+		sut := newValidatorSut(tc.value)
+		sut.base64 = true
+		sut.base64Validate()
+		assert(t, tc.expected, sut.Errors, tc.value, NoArgument)
+	}
+}
+
 func TestValidator_patternValidate(t *testing.T) {
 	cases := []struct {
 		annotation string

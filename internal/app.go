@@ -67,6 +67,7 @@ func (a *App) Run(ctx context.Context, args []string) error {
 	a.rootCmd.Flags().BoolVar(&validator.url, "url", false, "checks if the value is a valid URL")
 	a.rootCmd.Flags().BoolVar(&validator.email, "email", false, "checks if the value is a valid email address")
 	a.rootCmd.Flags().BoolVar(&validator.semver, "semver", false, "checks if the value is a valid semantic version")
+	a.rootCmd.Flags().BoolVar(&validator.base64, "base64", false, "checks if the value is encoded in Base64")
 	a.rootCmd.Flags().StringVar(&validator.pattern, "pattern", "", "checks if the value matches the specified regular expression")
 	a.rootCmd.Flags().StringVar(&validator.enum, "enum", "", "checks if the value can be found in the given enumerations")
 	a.rootCmd.Flags().StringVar(&validator.timestamp, "timestamp", "", "checks if the value is a timestamp whose format is specified by the layout [rfc3339,datetime,date,time]")
