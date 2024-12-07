@@ -40,6 +40,7 @@ type Validator struct {
 	email          bool
 	semver         bool
 	base64         bool
+	json           bool
 	pattern        string
 	enum           string
 	timestamp      string
@@ -63,6 +64,7 @@ func (v *Validator) validate() error {
 	v.emailValidate()
 	v.semverValidate()
 	v.base64Validate()
+	v.jsonValidate()
 	v.patternValidate()
 	v.enumValidate()
 	v.timestampValidate()
@@ -238,6 +240,13 @@ func (v *Validator) base64Validate() {
 		return
 	}
 	v.wrapValidate(is.Base64)
+}
+
+func (v *Validator) jsonValidate() {
+	if !v.json {
+		return
+	}
+	v.wrapValidate(is.JSON)
 }
 
 func (v *Validator) patternValidate() {
