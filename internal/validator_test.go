@@ -311,6 +311,25 @@ func TestValidator_urlValidate(t *testing.T) {
 	}
 }
 
+func TestValidator_emailValidate(t *testing.T) {
+	cases := []struct {
+		annotation string
+		value      string
+		expected   string
+	}{
+		{"valid1", "foo@example.com", ""},
+		{"valid2", "foo+bar@example.com", ""},
+		{"invalid", "example.com", "must be a valid email address"},
+	}
+
+	for _, tc := range cases {
+		sut := newValidatorSut(tc.value)
+		sut.email = true
+		sut.emailValidate()
+		assert(t, tc.expected, sut.Errors, tc.value, NoArgument)
+	}
+}
+
 func TestValidator_patternValidate(t *testing.T) {
 	cases := []struct {
 		annotation string
