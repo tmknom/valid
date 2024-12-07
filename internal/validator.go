@@ -2,6 +2,7 @@ package internal
 
 import (
 	"fmt"
+	"reflect"
 	"regexp"
 	"strconv"
 
@@ -19,6 +20,7 @@ type Validator struct {
 	value string
 	*Errors
 
+	min            string
 	exactlyLength  string
 	minLength      string
 	maxLength      string
@@ -34,6 +36,7 @@ type Validator struct {
 }
 
 func (v *Validator) validate() error {
+	v.minValidate()
 	v.exactlyLengthValidate()
 	v.minLengthValidate()
 	v.maxLengthValidate()
@@ -51,6 +54,32 @@ func (v *Validator) validate() error {
 		return nil
 	}
 	return fmt.Errorf(v.Errors.Error())
+}
+
+func (v *Validator) minValidate() {
+	if v.min == "" {
+		return
+	}
+
+	if value, err1 := strconv.ParseInt(v.value, 10, 64); err1 == nil {
+		condition, err2 := strconv.ParseInt(v.min, 10, 64)
+		if err2 != nil {
+			v.AddArgumentError(fmt.Errorf("invalid min: %s", v.min))
+		}
+		v.wrapAnyValidate(value, validation.Min(condition))
+		return
+	}
+
+	if value, err1 := strconv.ParseFloat(v.value, 64); err1 == nil {
+		condition, err2 := strconv.ParseFloat(v.min, 64)
+		if err2 != nil {
+			v.AddArgumentError(fmt.Errorf("invalid min: %s", v.min))
+		}
+		v.wrapAnyValidate(value, validation.Min(condition))
+		return
+	}
+
+	v.AddValidationError(fmt.Errorf("%s is not supported: %s", reflect.ValueOf(v.value).Type(), v.value))
 }
 
 func (v *Validator) exactlyLengthValidate() {
@@ -151,6 +180,13 @@ func (v *Validator) patternValidate() {
 
 func (v *Validator) wrapValidate(rules ...validation.Rule) {
 	err := validation.Validate(v.value, rules...)
+	if err != nil {
+		v.AddValidationError(err)
+	}
+}
+
+func (v *Validator) wrapAnyValidate(value any, rules ...validation.Rule) {
+	err := validation.Validate(value, rules...)
 	if err != nil {
 		v.AddValidationError(err)
 	}
