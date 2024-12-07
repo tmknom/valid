@@ -7,6 +7,7 @@ import (
 	"slices"
 	"strconv"
 	"strings"
+	"time"
 
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/go-ozzo/ozzo-validation/v4/is"
@@ -37,6 +38,7 @@ type Validator struct {
 	float          bool
 	pattern        string
 	enum           string
+	timestamp      string
 }
 
 func (v *Validator) validate() error {
@@ -55,6 +57,7 @@ func (v *Validator) validate() error {
 	v.floatValidate()
 	v.patternValidate()
 	v.enumValidate()
+	v.timestampValidate()
 
 	if !v.HasError() {
 		return nil
@@ -220,6 +223,25 @@ func (v *Validator) enumValidate() {
 	enumerations := strings.Split(v.enum, ",")
 	if !slices.Contains(enumerations, v.value) {
 		v.AddValidationError(fmt.Errorf("must be a valid value: %v", enumerations))
+	}
+}
+
+func (v *Validator) timestampValidate() {
+	if v.timestamp == "" {
+		return
+	}
+
+	layouts := map[string]string{
+		"rfc3339":  time.RFC3339,
+		"datetime": time.DateTime,
+		"date":     time.DateOnly,
+		"time":     time.TimeOnly,
+	}
+
+	if layout, ok := layouts[strings.ToLower(v.timestamp)]; ok {
+		v.wrapValidate(validation.Date(layout))
+	} else {
+		v.AddArgumentError(fmt.Errorf("not found layout: %s in [%v]", v.timestamp, layouts))
 	}
 }
 

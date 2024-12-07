@@ -332,6 +332,33 @@ func TestValidator_enumValidate(t *testing.T) {
 	}
 }
 
+func TestValidator_timestampValidate(t *testing.T) {
+	cases := []struct {
+		annotation string
+		value      string
+		argument   string
+		expected   string
+	}{
+		{"valid1", "2024-08-09T12:34:56+07:00", "rfc3339", ""},
+		{"valid2", "2024-08-09T12:34:56Z", "rfc3339", ""},
+		{"valid3", "2024-08-09T12:34:56Z", "RFC3339", ""},
+		{"valid4", "2024-08-09 12:34:56", "datetime", ""},
+		{"valid5", "2024-08-09", "date", ""},
+		{"valid6", "12:34:56", "time", ""},
+		{"invalid1", "2024-08-09 12:34:56", "rfc3339", "must be a valid date"},
+		{"invalid2", "2024-08-09T12:34:56Z", "datetime", "must be a valid date"},
+		{"invalid3", "12:34:56", "date", "must be a valid date"},
+		{"invalid4", "2024-08-09", "time", "must be a valid date"},
+	}
+
+	for _, tc := range cases {
+		sut := newValidatorSut(tc.value)
+		sut.timestamp = tc.argument
+		sut.timestampValidate()
+		assert(t, tc.expected, sut.Errors, tc.value, tc.argument)
+	}
+}
+
 func assert(t *testing.T, expected string, actual *Errors, value string, argument string) {
 	if expected == "" {
 		assertNoError(t, actual, value, argument)

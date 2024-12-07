@@ -66,6 +66,7 @@ func (a *App) Run(ctx context.Context, args []string) error {
 	a.rootCmd.Flags().BoolVar(&validator.float, "float", false, "checks if the value is a floating-point number")
 	a.rootCmd.Flags().StringVar(&validator.pattern, "pattern", "", "checks if the value matches the specified regular expression")
 	a.rootCmd.Flags().StringVar(&validator.enum, "enum", "", "checks if the value can be found in the given enumerations")
+	a.rootCmd.Flags().StringVar(&validator.timestamp, "timestamp", "", "checks if the value is a timestamp whose format is specified by the layout [rfc3339,datetime,date,time]")
 
 	a.rootCmd.RunE = func(cmd *cobra.Command, args []string) error { return validator.validate() }
 	return a.rootCmd.Execute()
