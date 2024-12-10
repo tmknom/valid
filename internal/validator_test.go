@@ -72,7 +72,7 @@ func TestValidator_maxValidate(t *testing.T) {
 	}
 }
 
-func TestValidator_exactlyLengthValidate(t *testing.T) {
+func TestValidator_exactLengthValidate(t *testing.T) {
 	cases := []struct {
 		annotation string
 		value      string
@@ -86,8 +86,8 @@ func TestValidator_exactlyLengthValidate(t *testing.T) {
 
 	for _, tc := range cases {
 		sut := newValidatorSut(tc.value)
-		sut.exactlyLength = tc.argument
-		sut.exactlyLengthValidate()
+		sut.exactLength = tc.argument
+		sut.exactLengthValidate()
 		assert(t, tc.expected, sut.Errors, tc.value, tc.argument)
 	}
 }
