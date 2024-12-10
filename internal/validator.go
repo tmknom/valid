@@ -25,7 +25,7 @@ type Validator struct {
 
 	min            string
 	max            string
-	exactlyLength  string
+	exactLength    string
 	minLength      string
 	maxLength      string
 	notEmpty       bool
@@ -49,7 +49,7 @@ type Validator struct {
 func (v *Validator) validate() error {
 	v.minValidate()
 	v.maxValidate()
-	v.exactlyLengthValidate()
+	v.exactLengthValidate()
 	v.minLengthValidate()
 	v.maxLengthValidate()
 	v.notEmptyValidate()
@@ -131,11 +131,11 @@ func (v *Validator) maxValidate() {
 	v.AddValidationError(fmt.Errorf("%s is not supported: %s", reflect.ValueOf(v.value).Type(), v.value))
 }
 
-func (v *Validator) exactlyLengthValidate() {
-	if v.exactlyLength == "" {
+func (v *Validator) exactLengthValidate() {
+	if v.exactLength == "" {
 		return
 	}
-	if number, ok := v.toInt(v.exactlyLength); ok {
+	if number, ok := v.toInt(v.exactLength); ok {
 		v.wrapValidate(validation.Length(number, number))
 	}
 }

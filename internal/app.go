@@ -53,7 +53,7 @@ func (a *App) Run(ctx context.Context, args []string) error {
 	a.rootCmd.Flags().StringVar(&validator.value, "value", "", "the value to validate")
 	a.rootCmd.Flags().StringVar(&validator.min, "min", "", "validates if the value is greater than or equal to the specified minimum")
 	a.rootCmd.Flags().StringVar(&validator.max, "max", "", "validates if the value is less than or equal to the specified maximum")
-	a.rootCmd.Flags().StringVar(&validator.exactlyLength, "exactly-length", "", "validates if the value's length is exactly equal to the specified number")
+	a.rootCmd.Flags().StringVar(&validator.exactLength, "exact-length", "", "validates if the value's length is exactly equal to the specified number")
 	a.rootCmd.Flags().StringVar(&validator.minLength, "min-length", "", "validates if the value's length is greater than or equal to the specified minimum")
 	a.rootCmd.Flags().StringVar(&validator.maxLength, "max-length", "", "validates if the value's length is less than or equal to the specified maximum")
 	a.rootCmd.Flags().BoolVar(&validator.notEmpty, "not-empty", false, "validates if the value is not empty")

@@ -15,7 +15,7 @@ func TestApp_Run_Valid(t *testing.T) {
 	}{
 		{
 			annotation: "number",
-			args:       []string{"--exactly-length", "5", "--digit", "--value", "12345"},
+			args:       []string{"--exact-length", "5", "--digit", "--value", "12345"},
 		},
 	}
 
@@ -37,12 +37,12 @@ func TestApp_Run_Invalid(t *testing.T) {
 	}{
 		{
 			annotation: "validation_error",
-			args:       []string{"--exactly-length", "5", "--digit", "--value", "123a"},
+			args:       []string{"--exact-length", "5", "--digit", "--value", "123a"},
 			expected:   "the length must be exactly 5, must contain digits only",
 		},
 		{
 			annotation: "argument_error",
-			args:       []string{"--exactly-length", "abc", "--digit", "--value", "123"},
+			args:       []string{"--exact-length", "abc", "--digit", "--value", "123"},
 			expected:   "strconv.Atoi: parsing \"abc\": invalid syntax",
 		},
 	}
