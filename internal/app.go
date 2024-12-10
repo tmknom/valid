@@ -27,7 +27,7 @@ func NewApp(io *IO) *App {
 		rootCmd: &cobra.Command{
 			Use:          AppName,
 			Version:      AppVersion,
-			Short:        "Tool for validating input values",
+			Short:        "Validates that input values meet specified rules",
 			SilenceUsage: true,
 		},
 	}
