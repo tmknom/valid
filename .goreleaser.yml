@@ -34,6 +34,21 @@ archives:
       - goos: windows
         format: zip
 
+signs:
+  - cmd: cosign
+    artifacts: checksum
+    signature: ${artifact}.sig
+    certificate: ${artifact}.pem
+    output: true
+    args:
+      - sign-blob
+      - --output-signature=${signature}
+      - --output-certificate=${certificate}
+      - --oidc-issuer=https://token.actions.githubusercontent.com
+      - --oidc-provider=github-actions
+      - --yes
+      - ${artifact}
+
 changelog:
   use: github-native
 
@@ -82,3 +97,14 @@ docker_manifests:
     image_templates:
       - "ghcr.io/{{ .Env.GITHUB_REPOSITORY_OWNER }}/{{ .ProjectName }}:{{ .Tag }}-amd64"
       - "ghcr.io/{{ .Env.GITHUB_REPOSITORY_OWNER }}/{{ .ProjectName }}:{{ .Tag }}-arm64"
+
+docker_signs:
+  - cmd: cosign
+    artifacts: all
+    output: true
+    args:
+      - sign
+      - --oidc-issuer=https://token.actions.githubusercontent.com
+      - --oidc-provider=github-actions
+      - --yes
+      - ${artifact}@${digest}
