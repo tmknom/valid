@@ -11,87 +11,18 @@ on:
           - minor
           - major
         default: minor
-      go-version-file:
-        type: string
-        default: go.mod
-        required: false
-        description: Path to the version file for Go, such as .go-version, go.mod or go.work.
 
 concurrency: ${{ github.workflow }}
 
 permissions: {}
 
 jobs:
-  release:
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
+  call:
+    uses: tmknom/release-workflows/.github/workflows/go.yml@f5dc2ef9b2947c25e209984d3c068877e467773b # v0.6.0
+    with:
+      bump-level: ${{ inputs.bump-level }}
     permissions:
       contents: write
       packages: write
       id-token: write
       attestations: write
-    steps:
-      - name: Checkout
-        uses: tmknom/checkout-action@v1
-
-      - name: Set up Go
-        uses: actions/setup-go@41dfa10bad2bb2ae585af6ee5bb4d7d973ad74ed # v5.1.0
-        with:
-          go-version-file: ${{ inputs.version-file }}
-
-      - name: Bump Version
-        id: bump
-        uses: tmknom/bump-version-action@87bed7f224292cab5b46a4cae9897bbf64153f00 # v0.2.1
-        with:
-          bump-level: ${{ inputs.bump-level }}
-
-      - name: Push Version Tag
-        uses: tmknom/push-version-tag-action@a9d1b46f9c29d3db510771452257b228bfd8a33f # v0.1.1
-        with:
-          version: ${{ steps.bump.outputs.version }}
-
-      - name: Install Cosign
-        uses: sigstore/cosign-installer@dc72c7d5c4d10cd6bcb8cf6e3fd625a9e5e537da # v3.7.0
-
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567 # v3.3.0
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ github.token }}
-
-      - name: Run GoReleaser
-        id: goreleaser
-        uses: goreleaser/goreleaser-action@9ed2f89a662bf1735a48bc8557fd212fa902bebf # v6.1.0
-        with:
-          distribution: goreleaser
-          version: ~> v2
-          args: release --clean
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-
-      - name: Attest binaries
-        uses: actions/attest-build-provenance@7668571508540a607bdfd90a87a560489fe372eb # v2.1.0
-        with:
-          subject-path: |
-            dist/*.tar.gz
-            dist/*.zip
-            dist/*.txt
-            dist/*.pem
-            dist/*.sig
-
-      - name: Describe manifest
-        id: manifest
-        env:
-          ARTIFACTS: ${{ steps.goreleaser.outputs.artifacts }}
-        run: |
-          set -x
-          digest="$(jq -r '. | map(select(.type=="Docker Manifest"))[0] | .extra.Digest' <<<"${ARTIFACTS}")"
-          echo "digest=${digest}" >> "$GITHUB_OUTPUT"
-
-      - name: Attest container images
-        uses: actions/attest-build-provenance@7668571508540a607bdfd90a87a560489fe372eb # v2.1.0
-        with:
-          subject-name: ghcr.io/${{ github.repository }}
-          subject-digest: ${{ steps.manifest.outputs.digest }}
-          push-to-registry: true
