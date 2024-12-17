@@ -51,7 +51,3 @@ Flags:
 ## Related projects
 
 - [validation-action](https://github.com/tmknom/validation-action): Composite Action for validating input values using `valid`.
-
-## License
-
-Apache 2 Licensed. See [LICENSE](LICENSE) for full details.
