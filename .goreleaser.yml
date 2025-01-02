@@ -2,90 +2,118 @@ version: 2
 
 before:
   hooks:
-    - go mod tidy
     - go generate ./...
+    - go mod tidy
+    - git --no-pager diff --exit-code go.mod go.sum
+
+report_sizes: true
+
+metadata:
+  mod_timestamp: "{{ .CommitTimestamp }}"
+
+gomod:
+  proxy: true
 
 builds:
-  - env:
-      - CGO_ENABLED=0
+  - main: ./cmd/{{ .ProjectName }}
     goos:
       - linux
       - windows
       - darwin
+    goarch:
+      - amd64
+      - arm64
+    env:
+      - CGO_ENABLED=0
+    flags:
+      - -trimpath
     ldflags:
       - -s -w
-      - -X main.name={{.ProjectName}}
-      - -X main.version={{.Version}}
-      - -X main.commit={{.Commit}}
-      - -X main.date={{.Date}}
-      - -X main.url={{.GitURL}}
-    main: ./cmd/{{.ProjectName}}
+      - -X main.name={{ .ProjectName }}
+      - -X main.version={{ .Version }}
+      - -X main.commit={{ .FullCommit }}
+      - -X main.date={{ .CommitDate }}
+      - -X main.url={{ .GitURL }}
+    mod_timestamp: "{{ .CommitTimestamp }}"
 
 archives:
-  - format: tar.gz
-    name_template: >-
-      {{ .ProjectName }}_
-      {{- title .Os }}_
-      {{- if eq .Arch "amd64" }}x86_64
-      {{- else if eq .Arch "386" }}i386
-      {{- else }}{{ .Arch }}{{ end }}
-      {{- if .Arm }}v{{ .Arm }}{{ end }}
-    format_overrides:
-      - goos: windows
-        format: zip
+  - format: binary
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    builds_info:
+      mtime: "{{ .CommitDate }}"
 
-signs:
-  - cmd: cosign
-    artifacts: checksum
-    signature: ${artifact}.sig
-    certificate: ${artifact}.pem
-    output: true
-    args:
-      - sign-blob
-      - --output-signature=${signature}
-      - --output-certificate=${certificate}
-      - --oidc-issuer=https://token.actions.githubusercontent.com
-      - --oidc-provider=github-actions
-      - --yes
-      - ${artifact}
+checksum:
+  name_template: "{{ .ProjectName }}_{{ .Version }}_checksums.txt"
+  algorithm: sha256
 
-changelog:
-  use: github-native
+nfpms:
+  - package_name: "{{ .ProjectName }}"
+    file_name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Arch }}"
+    homepage: "{{ .GitURL }}"
+    maintainer: "{{ .Env.GITHUB_REPOSITORY_OWNER }} {{ .Env.GITHUB_REPOSITORY_OWNER_ID }}+{{ .Env.GITHUB_REPOSITORY_OWNER }}@users.noreply.github.com"
+    description: "{{ .ProjectName }} {{ .Version }}"
+    license: "Apache License 2.0"
+    formats:
+      - apk
+      - deb
+      - rpm
+
+brews:
+  - repository:
+      owner: "{{ .Env.GITHUB_REPOSITORY_OWNER }}"
+      name: "{{ if isEnvSet \"HOMEBREW_TAP_REPOSITORY\" }}{{ .Env.HOMEBREW_TAP_REPOSITORY }}{{ else }}homebrew-tap{{ end }}"
+      branch: update/{{ .ProjectName }}_{{ .Version }}
+      token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
+      pull_request:
+        enabled: true
+    commit_author:
+      name: github-actions[bot]
+      email: 41898282+github-actions[bot]@users.noreply.github.com
+    directory: Formula
+    homepage: "{{ .GitURL }}"
+    description: "{{ .ProjectName }} {{ .Version }}"
+    license: Apache-2.0
+    test: |
+      system "#{bin}/{{ .ProjectName }} --version"
 
 dockers:
   - image_templates:
       - "ghcr.io/{{ .Env.GITHUB_REPOSITORY_OWNER }}/{{ .ProjectName }}:{{ .Tag }}-amd64"
-    dockerfile: Dockerfile
     use: buildx
     goos: linux
     goarch: amd64
     skip_push: false
+    dockerfile: Dockerfile
     build_flag_templates:
       - "--pull"
-      - "--label=org.opencontainers.image.title={{.ProjectName}}"
-      - "--label=org.opencontainers.image.created={{.Date}}"
-      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
-      - "--label=org.opencontainers.image.version={{.Version}}"
-      - "--label=org.opencontainers.image.url={{.ReleaseURL}}"
-      - "--label=org.opencontainers.image.source={{.GitURL}}"
-      - "--label=org.opencontainers.image.documentation={{.GitURL}}/blob/main/README.md"
+      - "--label=org.opencontainers.image.title={{ .ProjectName }}"
+      - "--label=org.opencontainers.image.description={{ .ProjectName }} {{ .Version }}"
+      - "--label=org.opencontainers.image.created={{ .CommitDate }}"
+      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
+      - "--label=org.opencontainers.image.version={{ .Version }}"
+      - "--label=org.opencontainers.image.url={{ .ReleaseURL }}"
+      - "--label=org.opencontainers.image.source={{ .GitURL }}"
+      - "--label=org.opencontainers.image.documentation={{ .GitURL }}/blob/main/README.md"
+      - "--label=org.opencontainers.image.licenses=Apache-2.0"
       - "--platform=linux/amd64"
   - image_templates:
       - "ghcr.io/{{ .Env.GITHUB_REPOSITORY_OWNER }}/{{ .ProjectName }}:{{ .Tag }}-arm64"
-    dockerfile: Dockerfile
     use: buildx
     goos: linux
     goarch: arm64
     skip_push: false
+    dockerfile: Dockerfile
     build_flag_templates:
       - "--pull"
-      - "--label=org.opencontainers.image.title={{.ProjectName}}"
-      - "--label=org.opencontainers.image.created={{.Date}}"
-      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
-      - "--label=org.opencontainers.image.version={{.Version}}"
-      - "--label=org.opencontainers.image.url={{.ReleaseURL}}"
-      - "--label=org.opencontainers.image.source={{.GitURL}}"
-      - "--label=org.opencontainers.image.documentation={{.GitURL}}/blob/main/README.md"
+      - "--label=org.opencontainers.image.title={{ .ProjectName }}"
+      - "--label=org.opencontainers.image.description={{ .ProjectName }} {{ .Version }}"
+      - "--label=org.opencontainers.image.created={{ .CommitDate }}"
+      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
+      - "--label=org.opencontainers.image.version={{ .Version }}"
+      - "--label=org.opencontainers.image.url={{ .ReleaseURL }}"
+      - "--label=org.opencontainers.image.source={{ .GitURL }}"
+      - "--label=org.opencontainers.image.documentation={{ .GitURL }}/blob/main/README.md"
+      - "--label=org.opencontainers.image.licenses=Apache-2.0"
       - "--platform=linux/arm64"
 
 docker_manifests:
@@ -98,13 +126,231 @@ docker_manifests:
       - "ghcr.io/{{ .Env.GITHUB_REPOSITORY_OWNER }}/{{ .ProjectName }}:{{ .Tag }}-amd64"
       - "ghcr.io/{{ .Env.GITHUB_REPOSITORY_OWNER }}/{{ .ProjectName }}:{{ .Tag }}-arm64"
 
+signs:
+  - cmd: cosign
+    artifacts: all
+    signature: ${artifact}.sig
+    certificate: ${artifact}.pem
+    output: true
+    args:
+      - sign-blob
+      - --output-signature=${signature}
+      - --output-certificate=${certificate}
+      - --oidc-issuer=https://token.actions.githubusercontent.com
+      - --oidc-provider=github-actions
+      - --yes
+      - ${artifact}
+
 docker_signs:
   - cmd: cosign
     artifacts: all
     output: true
     args:
       - sign
+      - --annotations="sourceRepositoryDigest={{ .FullCommit }}"
+      - --annotations="sourceRepositoryRef={{ .Env.GITHUB_REF }}"
+      - --annotations="sourceRepositoryURI={{ .GitURL }}"
+      - --annotations="sourceRepositoryIdentifier={{ .Env.GITHUB_REPOSITORY_ID }}"
+      - --annotations="sourceRepositoryOwnerURI={{ .Env.GITHUB_SERVER_URL }}/{{ .Env.GITHUB_REPOSITORY_OWNER }}"
+      - --annotations="sourceRepositoryOwnerIdentifier={{ .Env.GITHUB_REPOSITORY_OWNER_ID }}"
+      - --annotations="runnerEnvironment={{ .Env.RUNNER_ENVIRONMENT }}"
+      - --annotations="runInvocationURI={{ .Env.GITHUB_SERVER_URL }}/{{ .Env.GITHUB_REPOSITORY }}/actions/runs/{{ .Env.GITHUB_RUN_ID }}/attempts/{{ .Env.GITHUB_RUN_ATTEMPT }}"
+      - --annotations="buildConfigURI={{ .Env.GITHUB_SERVER_URL }}/{{ .Env.GITHUB_WORKFLOW_REF }}"
+      - --annotations="buildConfigDigest={{ .Env.GITHUB_WORKFLOW_SHA }}"
+      - --annotations="buildTrigger={{ .Env.GITHUB_EVENT_NAME }}"
+      - --annotations="_releaseTag=v{{ .Version }}"
+      - --annotations="_releaseURL={{ .ReleaseURL }}"
+      - --annotations="_releaseDate={{ .CommitDate }}"
+      - --annotations="_releaseRepository={{ .Env.GITHUB_REPOSITORY }}"
+      - --annotations="_imageName=${artifact}"
+      - --annotations="_imageTag={{ .Tag }}"
+      - --annotations="_imageDigest=${digest}"
       - --oidc-issuer=https://token.actions.githubusercontent.com
       - --oidc-provider=github-actions
       - --yes
       - ${artifact}@${digest}
+
+# TODO
+# "buildSignerURI": "https://github.com/tmknom/test-goreleaser/.github/workflows/reusable-release.yml@refs/heads/main",
+# "buildSignerDigest": "46faec918d673d4c68d8d6525d07272b8115f1d6",
+
+sboms:
+  - id: binary
+    artifacts: binary
+    documents:
+      - "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}.sbom.json"
+  - id: package
+    artifacts: package
+
+changelog:
+  use: github-native
+
+release:
+  mode: append
+  draft: true
+  footer: |
+    ---
+
+    ## Installation
+
+    Packages downloaded from {{ .Env.GITHUB_SERVER_URL }}/{{ .Env.GITHUB_REPOSITORY }}/releases/ are considered official binaries.
+    We focus on popular operating systems, such as Linux, Windows, and macOS, and CPU architectures, such as amd64 and arm64.
+
+    ### Linux
+
+    #### DEB-based istributions (Ubuntu/Debian)
+
+    Download the `.deb` packages for your architecture (e.g., `*_linux_amd64.deb` or `*_linux_arm64.deb`), and install using `dpkg` command.
+
+    ```shell
+    curl -sSL -o {{ .ProjectName }}.deb "{{ .Env.GITHUB_SERVER_URL }}/{{ .Env.GITHUB_REPOSITORY }}/releases/download/{{ .Version }}/{{ .ProjectName }}_{{ .Version }}_linux_amd64.deb"
+    dpkg -i {{ .ProjectName }}.deb
+    ```
+
+    #### RPM-based distributions (Fedora/RedHat/CentOS)
+
+    Download the `.rpm` packages for your architecture (e.g., `*_linux_amd64.rpm` or `*_linux_arm64.rpm`), and install using `rpm` command.
+
+    ```shell
+    curl -sSL -o {{ .ProjectName }}.rpm "{{ .Env.GITHUB_SERVER_URL }}/{{ .Env.GITHUB_REPOSITORY }}/releases/download/{{ .Version }}/{{ .ProjectName }}_{{ .Version }}_linux_amd64.rpm"
+    rpm -ivh {{ .ProjectName }}.rpm
+    ```
+
+    #### APK-based distributions (Alpine Linux)
+
+    Download the `.apk` packages for your architecture (e.g., `*_linux_amd64.apk` or `*_linux_arm64.apk`), and install using `apk` command.
+
+    ```shell
+    curl -sSL -o {{ .ProjectName }}.apk "{{ .Env.GITHUB_SERVER_URL }}/{{ .Env.GITHUB_REPOSITORY }}/releases/download/{{ .Version }}/{{ .ProjectName }}_{{ .Version }}_linux_amd64.apk"
+    apk add --allow-untrusted {{ .ProjectName }}.apk
+    ```
+
+    #### Manually
+
+    Download the binaries for your architecture (e.g., `*_linux_amd64` or `*_linux_arm64`), make the binary executable, and move to a directory in your `PATH`.
+
+    ```shell
+    curl -sSL -o {{ .ProjectName }} "{{ .Env.GITHUB_SERVER_URL }}/{{ .Env.GITHUB_REPOSITORY }}/releases/download/{{ .Version }}/{{ .ProjectName }}_{{ .Version }}_linux_amd64"
+    chmod +x {{ .ProjectName }}
+    sudo mv {{ .ProjectName }} /usr/local/bin/{{ .ProjectName }}
+    ```
+
+    ### macOS
+
+    #### Homebrew
+
+    ```shell
+    brew install tmknom/tap/{{ .ProjectName }}
+    ```
+
+    #### Manually
+
+    Download the binaries for your architecture (e.g., `*_darwin_amd64` or `*_darwin_arm64`), make the binary executable, and move to a directory in your `PATH`.
+
+    ```shell
+    curl -sSL -o {{ .ProjectName }} "{{ .Env.GITHUB_SERVER_URL }}/{{ .Env.GITHUB_REPOSITORY }}/releases/download/{{ .Version }}/{{ .ProjectName }}_{{ .Version }}_darwin_amd64"
+    chmod +x {{ .ProjectName }}
+    sudo mv {{ .ProjectName }} /usr/local/bin/{{ .ProjectName }}
+    ```
+
+    ### Container images
+
+    ```shell
+    docker pull ghcr.io/{{ .Env.GITHUB_REPOSITORY }}:v{{ .Version }}
+    ```
+
+    ## Binaries verification
+
+    All artifacts are checksummed, and signed by Cosign using identity-based ("keyless") signing and transparency.
+
+    ### Checksum verification
+
+    1. Install [GitHub CLI](https://cli.github.com/) and [Cosign](https://github.com/sigstore/cosign) if not already available.
+    2. Download all artifacts using GitHub CLI:
+        ```shell
+        gh release download v{{ .Version }}
+        ```
+    3. Verify the signature using:
+        ```shell
+        cosign verify-blob \
+          --signature "{{ .ProjectName }}_{{ .Version }}_checksums.txt.sig" \
+          --certificate "{{ .ProjectName }}_{{ .Version }}_checksums.txt.pem" \
+          --certificate-oidc-issuer "https://token.actions.githubusercontent.com" \
+          --certificate-identity-regexp "^https://github\.com/{{ .Env.GITHUB_REPOSITORY_OWNER }}/release-workflows/\.github/workflows/go\.yml@.+$" \
+          --certificate-github-workflow-repository "{{ .Env.GITHUB_REPOSITORY }}" \
+          --certificate-github-workflow-sha "{{ .FullCommit }}" \
+          "{{ .ProjectName }}_{{ .Version }}_checksums.txt"
+        ```
+    4. Verify the checksum of the downloaded files using:
+        ```shell
+        sha256sum --ignore-missing -c "{{ .ProjectName }}_{{ .Version }}_checksums.txt"
+        ```
+        Ensure that the output indicates a valid match.
+
+    ### Cosign verification
+
+    You can verify all artifacts, such as executable binaries, Linux packages, checksum files, and SBOMs.
+    For example, the `linux/amd64` binary:
+
+    1. Install [Cosign](https://github.com/sigstore/cosign) if not already available.
+    2. Verify the signature using:
+        ```shell
+        cosign verify-blob \
+          --signature "{{ .ProjectName }}_{{ .Version }}_linux_amd64.sig" \
+          --certificate "{{ .ProjectName }}_{{ .Version }}_linux_amd64.pem" \
+          --certificate-oidc-issuer "https://token.actions.githubusercontent.com" \
+          --certificate-identity-regexp "^https://github\.com/{{ .Env.GITHUB_REPOSITORY_OWNER }}/release-workflows/\.github/workflows/go\.yml@.+$" \
+          --certificate-github-workflow-repository "{{ .Env.GITHUB_REPOSITORY }}" \
+          --certificate-github-workflow-sha "{{ .FullCommit }}" \
+          "{{ .ProjectName }}_{{ .Version }}_linux_amd64"
+        ```
+
+    ### GitHub attestations verification
+
+    You can verify all artifacts, such as executable binaries, Linux packages, checksum files, and SBOMs.
+    For example, the `linux/amd64` binary:
+
+    1. Install [GitHub CLI](https://cli.github.com/) if not already available.
+    2. Verify the attestation:
+        ```shell
+        gh attestation verify "{{ .ProjectName }}_{{ .Version }}_linux_amd64" \
+          --deny-self-hosted-runners \
+          --repo "{{ .Env.GITHUB_REPOSITORY }}" \
+          --cert-oidc-issuer "https://token.actions.githubusercontent.com" \
+          --cert-identity-regex "^https://github\.com/{{ .Env.GITHUB_REPOSITORY_OWNER }}/release-workflows/\.github/workflows/go\.yml@.+$"
+        ```
+
+    ## Container images verification
+
+    Container images are signed by Cosign using identity-based ("keyless") signing and transparency.
+
+    ### Cosign verification
+
+    You can verify container images.
+    For example, `amd64` image:
+
+    1. Install [Cosign](https://github.com/sigstore/cosign) if not already available.
+    2. Verify the signature using:
+        ```shell
+        cosign verify \
+          --certificate-oidc-issuer "https://token.actions.githubusercontent.com" \
+          --certificate-identity-regexp "^https://github\.com/{{ .Env.GITHUB_REPOSITORY_OWNER }}/release-workflows/\.github/workflows/go\.yml@.+$" \
+          --certificate-github-workflow-repository "{{ .Env.GITHUB_REPOSITORY }}" \
+          --certificate-github-workflow-sha "{{ .FullCommit }}" \
+          ghcr.io/{{ .Env.GITHUB_REPOSITORY }}:v{{ .Version }}
+        ```
+
+    ### GitHub attestations verification
+
+    You can verify all artifacts, such as executable binaries, Linux packages, checksum files, and SBOMs.
+    For example, the `linux/amd64` binary:
+
+    1. Install [GitHub CLI](https://cli.github.com/) if not already available.
+    2. Verify the attestation:
+        ```shell
+        gh attestation verify oci://ghcr.io/{{ .Env.GITHUB_REPOSITORY }}:v{{ .Version }} \
+          --deny-self-hosted-runners \
+          --repo "{{ .Env.GITHUB_REPOSITORY }}" \
+          --cert-oidc-issuer "https://token.actions.githubusercontent.com" \
+          --cert-identity-regex "^https://github\.com/{{ .Env.GITHUB_REPOSITORY_OWNER }}/release-workflows/\.github/workflows/go\.yml@.+$"
+        ```
