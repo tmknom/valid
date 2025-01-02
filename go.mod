@@ -1,4 +1,4 @@
-module github.com/tmknom/validation-cli
+module github.com/tmknom/valid
 
 go 1.22.4
 
