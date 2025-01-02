@@ -6,7 +6,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/tmknom/validation-cli/internal"
+	"github.com/tmknom/valid/internal"
 )
 
 // Specify explicitly in ldflags
