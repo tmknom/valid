@@ -35,6 +35,7 @@ type Validator struct {
 	ascii          bool
 	printableASCII bool
 	lowerCase      bool
+	upperCase      bool
 	int            bool
 	float          bool
 	url            bool
@@ -211,6 +212,13 @@ func (v *Validator) lowerCaseValidate() {
 		return
 	}
 	v.wrapValidate(is.LowerCase)
+}
+
+func (v *Validator) upperCaseValidate() {
+	if !v.upperCase {
+		return
+	}
+	v.wrapValidate(is.UpperCase)
 }
 
 func (v *Validator) intValidate() {
