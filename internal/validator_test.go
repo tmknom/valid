@@ -252,6 +252,25 @@ func TestValidator_printableASCIIValidate(t *testing.T) {
 	}
 }
 
+func TestValidator_lowerCaseValidate(t *testing.T) {
+	cases := []struct {
+		annotation string
+		value      string
+		expected   string
+	}{
+		{"valid1", "abc", ""},
+		{"valid2", "abc123<>", ""},
+		{"invalid", "abcABC", "must be in lower case"},
+	}
+
+	for _, tc := range cases {
+		sut := newValidatorSut(tc.value)
+		sut.lowerCase = true
+		sut.lowerCaseValidate()
+		assert(t, tc.expected, sut.Errors, tc.value, NoArgument)
+	}
+}
+
 func TestValidator_intValidate(t *testing.T) {
 	cases := []struct {
 		annotation string
