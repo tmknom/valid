@@ -37,6 +37,7 @@ type Validator struct {
 	int            bool
 	float          bool
 	url            bool
+	domain         bool
 	email          bool
 	semver         bool
 	uuid           bool
@@ -62,6 +63,7 @@ func (v *Validator) validate() error {
 	v.intValidate()
 	v.floatValidate()
 	v.urlValidate()
+	v.domainValidate()
 	v.emailValidate()
 	v.semverValidate()
 	v.uuidValidate()
@@ -221,6 +223,13 @@ func (v *Validator) urlValidate() {
 		return
 	}
 	v.wrapValidate(is.RequestURL)
+}
+
+func (v *Validator) domainValidate() {
+	if !v.domain {
+		return
+	}
+	v.wrapValidate(is.Domain)
 }
 
 func (v *Validator) emailValidate() {

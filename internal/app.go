@@ -65,6 +65,7 @@ func (a *App) Run(ctx context.Context, args []string) error {
 	a.rootCmd.Flags().BoolVar(&validator.int, "int", false, "validates if the value is an integer")
 	a.rootCmd.Flags().BoolVar(&validator.float, "float", false, "validates if the value is a floating-point number")
 	a.rootCmd.Flags().BoolVar(&validator.url, "url", false, "validates if the value is a valid URL")
+	a.rootCmd.Flags().BoolVar(&validator.domain, "domain", false, "validates if the value is a valid domain")
 	a.rootCmd.Flags().BoolVar(&validator.email, "email", false, "validates if the value is a valid email address")
 	a.rootCmd.Flags().BoolVar(&validator.semver, "semver", false, "validates if the value is a valid semantic version")
 	a.rootCmd.Flags().BoolVar(&validator.uuid, "uuid", false, "validates if the value is a valid UUID")
