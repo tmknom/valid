@@ -350,6 +350,24 @@ func TestValidator_semverValidate(t *testing.T) {
 	}
 }
 
+func TestValidator_uuidValidate(t *testing.T) {
+	cases := []struct {
+		annotation string
+		value      string
+		expected   string
+	}{
+		{"valid", "b4563933-7bf8-4d9b-b4cd-d0c6f85b5925", ""},
+		{"invalid", "b4563933-7bf8-4d9b-b4cd-d0c6f85b592", "must be a valid UUID"},
+	}
+
+	for _, tc := range cases {
+		sut := newValidatorSut(tc.value)
+		sut.uuid = true
+		sut.uuidValidate()
+		assert(t, tc.expected, sut.Errors, tc.value, NoArgument)
+	}
+}
+
 func TestValidator_base64Validate(t *testing.T) {
 	cases := []struct {
 		annotation string

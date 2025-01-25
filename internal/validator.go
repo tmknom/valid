@@ -39,6 +39,7 @@ type Validator struct {
 	url            bool
 	email          bool
 	semver         bool
+	uuid           bool
 	base64         bool
 	json           bool
 	pattern        string
@@ -63,6 +64,7 @@ func (v *Validator) validate() error {
 	v.urlValidate()
 	v.emailValidate()
 	v.semverValidate()
+	v.uuidValidate()
 	v.base64Validate()
 	v.jsonValidate()
 	v.patternValidate()
@@ -233,6 +235,13 @@ func (v *Validator) semverValidate() {
 		return
 	}
 	v.wrapValidate(is.Semver)
+}
+
+func (v *Validator) uuidValidate() {
+	if !v.uuid {
+		return
+	}
+	v.wrapValidate(is.UUID)
 }
 
 func (v *Validator) base64Validate() {
