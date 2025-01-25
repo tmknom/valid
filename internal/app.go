@@ -67,6 +67,7 @@ func (a *App) Run(ctx context.Context, args []string) error {
 	a.rootCmd.Flags().BoolVar(&validator.url, "url", false, "validates if the value is a valid URL")
 	a.rootCmd.Flags().BoolVar(&validator.email, "email", false, "validates if the value is a valid email address")
 	a.rootCmd.Flags().BoolVar(&validator.semver, "semver", false, "validates if the value is a valid semantic version")
+	a.rootCmd.Flags().BoolVar(&validator.uuid, "uuid", false, "validates if the value is a valid UUID")
 	a.rootCmd.Flags().BoolVar(&validator.base64, "base64", false, "validates if the value is valid Base64")
 	a.rootCmd.Flags().BoolVar(&validator.json, "json", false, "validates if the value is valid JSON")
 	a.rootCmd.Flags().StringVar(&validator.pattern, "pattern", "", "validates if the value matches the specified regular expression")
