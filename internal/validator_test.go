@@ -311,6 +311,24 @@ func TestValidator_urlValidate(t *testing.T) {
 	}
 }
 
+func TestValidator_domainValidate(t *testing.T) {
+	cases := []struct {
+		annotation string
+		value      string
+		expected   string
+	}{
+		{"valid", "example.com", ""},
+		{"invalid", "localhost", "must be a valid domain"},
+	}
+
+	for _, tc := range cases {
+		sut := newValidatorSut(tc.value)
+		sut.domain = true
+		sut.domainValidate()
+		assert(t, tc.expected, sut.Errors, tc.value, NoArgument)
+	}
+}
+
 func TestValidator_emailValidate(t *testing.T) {
 	cases := []struct {
 		annotation string
