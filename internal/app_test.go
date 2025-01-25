@@ -38,12 +38,17 @@ func TestApp_Run_Invalid(t *testing.T) {
 		{
 			annotation: "validation_error",
 			args:       []string{"--exact-length", "5", "--digit", "--value", "123a"},
-			expected:   "the length must be exactly 5, must contain digits only",
+			expected:   "Validation error: The value \"123a\" is invalid. Issues: the length must be exactly 5, must contain digits only",
 		},
 		{
 			annotation: "argument_error",
-			args:       []string{"--exact-length", "abc", "--digit", "--value", "123"},
-			expected:   "strconv.Atoi: parsing \"abc\": invalid syntax",
+			args:       []string{"--min", "5", "--exact-length", "abc", "--alphanumeric", "--value", "123a"},
+			expected:   "Argument error: --min cannot validate \"123a\", --exact-length must be an integer number",
+		},
+		{
+			annotation: "validation_and_argument_error",
+			args:       []string{"--exact-length", "abc", "--digit", "--value", "123a"},
+			expected:   "Validation error: The value \"123a\" is invalid. Issues: must contain digits only; Argument error: --exact-length must be an integer number",
 		},
 	}
 
@@ -60,7 +65,7 @@ func TestApp_Run_Invalid(t *testing.T) {
 }
 
 func messageWithArgs(expected string, actual any, args []string) string {
-	return fmt.Sprintf("expected: %s, actual: %#v, args: %v", expected, actual, args)
+	return fmt.Sprintf("\n expected: %s\n actual:   %s\n args:     %v", expected, actual, args)
 }
 
 func FakeTestIO() *IO {

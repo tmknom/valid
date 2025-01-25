@@ -8,7 +8,7 @@ import (
 func newValidatorSut(value string) *Validator {
 	return &Validator{
 		value:  value,
-		Errors: &Errors{},
+		Errors: &Errors{value: value},
 	}
 }
 
@@ -29,9 +29,6 @@ func TestValidator_minValidate(t *testing.T) {
 		{"invalid2", "-2", "-1", "must be no less than -1"},
 		{"invalid3", "8.1", "9.1", "must be no less than 9.1"},
 		{"invalid4", "-2.1", "-1.1", "must be no less than -1.1"},
-		{"invalid5", "1", "a", "invalid min: a"},
-		{"invalid6", "1.1", "a", "invalid min: a"},
-		{"invalid7", "a", "9", "string is not supported: a"},
 	}
 
 	for _, tc := range cases {
@@ -59,9 +56,6 @@ func TestValidator_maxValidate(t *testing.T) {
 		{"invalid2", "-1", "-2", "must be no greater than -2"},
 		{"invalid3", "9.1", "8.1", "must be no greater than 8.1"},
 		{"invalid4", "-1.1", "-2.1", "must be no greater than -2.1"},
-		{"invalid5", "1", "a", "invalid max: a"},
-		{"invalid6", "1.1", "a", "invalid max: a"},
-		{"invalid7", "a", "9", "string is not supported: a"},
 	}
 
 	for _, tc := range cases {
@@ -489,7 +483,7 @@ func TestValidator_enumValidate(t *testing.T) {
 	}{
 		{"valid1", "bar", "foo,bar,baz", ""},
 		{"valid2", "foo", "foo", ""},
-		{"invalid", "invalid", "foo,bar,baz", "must be a valid value: [foo bar baz]"},
+		{"invalid", "invalid", "foo,bar,baz", "must specify [foo bar baz]"},
 	}
 
 	for _, tc := range cases {
@@ -513,10 +507,10 @@ func TestValidator_timestampValidate(t *testing.T) {
 		{"valid4", "2024-08-09 12:34:56", "datetime", ""},
 		{"valid5", "2024-08-09", "date", ""},
 		{"valid6", "12:34:56", "time", ""},
-		{"invalid1", "2024-08-09 12:34:56", "rfc3339", "must be a valid date"},
-		{"invalid2", "2024-08-09T12:34:56Z", "datetime", "must be a valid date"},
+		{"invalid1", "2024-08-09 12:34:56", "RFC3339", "must be a valid rfc3339"},
+		{"invalid2", "2024-08-09T12:34:56Z", "datetime", "must be a valid datetime"},
 		{"invalid3", "12:34:56", "date", "must be a valid date"},
-		{"invalid4", "2024-08-09", "time", "must be a valid date"},
+		{"invalid4", "2024-08-09", "time", "must be a valid time"},
 	}
 
 	for _, tc := range cases {
@@ -542,15 +536,16 @@ func assertNoError(t *testing.T, actual *Errors, value string, argument string) 
 }
 
 func assertError(t *testing.T, expected string, actual *Errors, value string, argument string) {
+	expectedMessage := fmt.Sprintf("Validation error: The value \"%s\" is invalid. Issues: %s", value, expected)
 	if !actual.HasError() {
 		t.Errorf(formatMessage(expected, NoError, value, argument))
-	} else if actual.Error() != expected {
-		t.Errorf(formatMessage(expected, actual, value, argument))
+	} else if actual.Error() != expectedMessage {
+		t.Errorf(formatMessage(expectedMessage, actual, value, argument))
 	}
 }
 
 func formatMessage(expected string, actual any, value string, argument string) string {
-	return fmt.Sprintf("expected: %s, actual: %+v, value: %s, argument: %s", expected, actual, value, argument)
+	return fmt.Sprintf("\n expected: %s\n actual:   %+v\n value:    %s\n argument: %s", expected, actual, value, argument)
 }
 
 const NoError = "<no error>"

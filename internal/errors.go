@@ -1,10 +1,12 @@
 package internal
 
 import (
+	"fmt"
 	"strings"
 )
 
 type Errors struct {
+	value       string
 	validations []error
 	arguments   []error
 }
@@ -30,12 +32,38 @@ func (e *Errors) hasArguments() bool {
 }
 
 func (e *Errors) Error() string {
-	messages := make([]string, 0, len(e.validations)+len(e.arguments))
+	if e.hasValidations() && e.hasArguments() {
+		return strings.Join([]string{e.joinValidationError(), e.joinArgumentError()}, "; ")
+	} else if e.hasValidations() {
+		return e.joinValidationError()
+	} else if e.hasArguments() {
+		return e.joinArgumentError()
+	} else {
+		return ""
+	}
+}
+
+func (e *Errors) joinValidationError() string {
+	if !e.hasValidations() {
+		return ""
+	}
+
+	issues := make([]string, 0, len(e.validations))
 	for _, err := range e.validations {
-		messages = append(messages, err.Error())
+		issues = append(issues, err.Error())
 	}
+	message := fmt.Sprintf("Validation error: The value \"%s\" is invalid. Issues: %s", e.value, strings.Join(issues, ", "))
+	return message
+}
+
+func (e *Errors) joinArgumentError() string {
+	if !e.hasArguments() {
+		return ""
+	}
+
+	issues := make([]string, 0, len(e.arguments))
 	for _, err := range e.arguments {
-		messages = append(messages, err.Error())
+		issues = append(issues, err.Error())
 	}
-	return strings.Join(messages, ", ")
+	return "Argument error: " + strings.Join(issues, ", ")
 }
