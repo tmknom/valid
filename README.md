@@ -27,6 +27,7 @@ Flags:
       --ascii                 validates if the value contains only ASCII characters
       --base64                validates if the value is valid Base64
       --digit                 validates if the value contains only digits (0-9)
+      --domain                validates if the value is a valid domain
       --email                 validates if the value is a valid email address
       --enum string           validates if the value matches any of the specified enumerations
       --exact-length string   validates if the value's length is exactly equal to the specified number
@@ -34,6 +35,7 @@ Flags:
   -h, --help                  help for valid
       --int                   validates if the value is an integer
       --json                  validates if the value is valid JSON
+      --lower-case            validates if the value contains only lower case unicode letters
       --max string            validates if the value is less than or equal to the specified maximum
       --max-length string     validates if the value's length is less than or equal to the specified maximum
       --min string            validates if the value is greater than or equal to the specified minimum
@@ -43,7 +45,9 @@ Flags:
       --printable-ascii       validates if the value contains only printable ASCII characters
       --semver                validates if the value is a valid semantic version
       --timestamp string      validates if the value matches a timestamp format [rfc3339, datetime, date, time]
+      --upper-case            validates if the value contains only upper case unicode letters
       --url                   validates if the value is a valid URL
+      --uuid                  validates if the value is a valid UUID
       --value string          the value to validate
   -v, --version               version for valid
 ```
