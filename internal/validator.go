@@ -62,6 +62,7 @@ func (v *Validator) validate() error {
 	v.asciiValidate()
 	v.printableASCIIValidate()
 	v.lowerCaseValidate()
+	v.upperCaseValidate()
 	v.intValidate()
 	v.floatValidate()
 	v.urlValidate()
