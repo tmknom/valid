@@ -2,7 +2,6 @@ package internal
 
 import (
 	"fmt"
-	"reflect"
 	"regexp"
 	"slices"
 	"strconv"
@@ -14,9 +13,7 @@ import (
 )
 
 func newValidator() *Validator {
-	return &Validator{
-		Errors: &Errors{},
-	}
+	return &Validator{}
 }
 
 type Validator struct {
@@ -51,6 +48,8 @@ type Validator struct {
 }
 
 func (v *Validator) validate() error {
+	v.Errors = &Errors{value: v.value}
+
 	v.minValidate()
 	v.maxValidate()
 	v.exactLengthValidate()
@@ -90,7 +89,7 @@ func (v *Validator) minValidate() {
 	if value, err1 := strconv.ParseInt(v.value, 10, 64); err1 == nil {
 		condition, err2 := strconv.ParseInt(v.min, 10, 64)
 		if err2 != nil {
-			v.AddArgumentError(fmt.Errorf("invalid min: %s", v.min))
+			v.AddArgumentError(fmt.Errorf("--min must be an integer number"))
 			return
 		}
 		v.wrapAnyValidate(value, validation.Min(condition))
@@ -100,14 +99,15 @@ func (v *Validator) minValidate() {
 	if value, err1 := strconv.ParseFloat(v.value, 64); err1 == nil {
 		condition, err2 := strconv.ParseFloat(v.min, 64)
 		if err2 != nil {
-			v.AddArgumentError(fmt.Errorf("invalid min: %s", v.min))
+			v.AddArgumentError(fmt.Errorf("--min must be an float number"))
 			return
 		}
 		v.wrapAnyValidate(value, validation.Min(condition))
 		return
 	}
 
-	v.AddValidationError(fmt.Errorf("%s is not supported: %s", reflect.ValueOf(v.value).Type(), v.value))
+	message := fmt.Sprintf("--min cannot validate \"%s\"", v.value)
+	v.AddArgumentError(fmt.Errorf(message))
 }
 
 func (v *Validator) maxValidate() {
@@ -118,7 +118,7 @@ func (v *Validator) maxValidate() {
 	if value, err1 := strconv.ParseInt(v.value, 10, 64); err1 == nil {
 		condition, err2 := strconv.ParseInt(v.max, 10, 64)
 		if err2 != nil {
-			v.AddArgumentError(fmt.Errorf("invalid max: %s", v.max))
+			v.AddArgumentError(fmt.Errorf("--max must be an integer number"))
 			return
 		}
 		v.wrapAnyValidate(value, validation.Max(condition))
@@ -128,41 +128,54 @@ func (v *Validator) maxValidate() {
 	if value, err1 := strconv.ParseFloat(v.value, 64); err1 == nil {
 		condition, err2 := strconv.ParseFloat(v.max, 64)
 		if err2 != nil {
-			v.AddArgumentError(fmt.Errorf("invalid max: %s", v.max))
+			v.AddArgumentError(fmt.Errorf("--max must be an float number"))
 			return
 		}
 		v.wrapAnyValidate(value, validation.Max(condition))
 		return
 	}
 
-	v.AddValidationError(fmt.Errorf("%s is not supported: %s", reflect.ValueOf(v.value).Type(), v.value))
+	message := fmt.Sprintf("--max cannot validate \"%s\"", v.value)
+	v.AddArgumentError(fmt.Errorf(message))
 }
 
 func (v *Validator) exactLengthValidate() {
 	if v.exactLength == "" {
 		return
 	}
-	if number, ok := v.toInt(v.exactLength); ok {
-		v.wrapValidate(validation.Length(number, number))
+
+	number, err := strconv.Atoi(v.exactLength)
+	if err != nil {
+		v.AddArgumentError(fmt.Errorf("--exact-length must be an integer number"))
+		return
 	}
+	v.wrapValidate(validation.Length(number, number))
 }
 
 func (v *Validator) minLengthValidate() {
 	if v.minLength == "" {
 		return
 	}
-	if number, ok := v.toInt(v.minLength); ok {
-		v.wrapValidate(validation.Length(number, 0))
+
+	number, err := strconv.Atoi(v.minLength)
+	if err != nil {
+		v.AddArgumentError(fmt.Errorf("--min-length must be an integer number"))
+		return
 	}
+	v.wrapValidate(validation.Length(number, 0))
 }
 
 func (v *Validator) maxLengthValidate() {
 	if v.maxLength == "" {
 		return
 	}
-	if number, ok := v.toInt(v.maxLength); ok {
-		v.wrapValidate(validation.Length(0, number))
+
+	number, err := strconv.Atoi(v.maxLength)
+	if err != nil {
+		v.AddArgumentError(fmt.Errorf("--max-length must be an integer number"))
+		return
 	}
+	v.wrapValidate(validation.Length(0, number))
 }
 
 func (v *Validator) notEmptyValidate() {
@@ -291,7 +304,8 @@ func (v *Validator) patternValidate() {
 
 	regex, err := regexp.Compile(v.pattern)
 	if err != nil {
-		v.AddArgumentError(err)
+		message := fmt.Sprintf("--pattern \"%s\" is not a valid regular expression", v.pattern)
+		v.AddArgumentError(fmt.Errorf(message))
 		return
 	}
 	v.wrapValidate(validation.Match(regex))
@@ -304,7 +318,7 @@ func (v *Validator) enumValidate() {
 
 	enumerations := strings.Split(v.enum, ",")
 	if !slices.Contains(enumerations, v.value) {
-		v.AddValidationError(fmt.Errorf("must be a valid value: %v", enumerations))
+		v.AddValidationError(fmt.Errorf("must specify %v", enumerations))
 	}
 }
 
@@ -320,10 +334,19 @@ func (v *Validator) timestampValidate() {
 		"time":     time.TimeOnly,
 	}
 
-	if layout, ok := layouts[strings.ToLower(v.timestamp)]; ok {
-		v.wrapValidate(validation.Date(layout))
+	lowerTimestamp := strings.ToLower(v.timestamp)
+	if layout, ok := layouts[lowerTimestamp]; ok {
+		err := validation.Validate(v.value, validation.Date(layout))
+		if err != nil {
+			v.AddValidationError(fmt.Errorf("must be a valid %s", lowerTimestamp))
+		}
 	} else {
-		v.AddArgumentError(fmt.Errorf("not found layout: %s in [%v]", v.timestamp, layouts))
+		var keys []string
+		for key, _ := range layouts {
+			keys = append(keys, key)
+		}
+		message := fmt.Sprintf("--timestamp must specify %v", keys)
+		v.AddArgumentError(fmt.Errorf(message))
 	}
 }
 
@@ -339,13 +362,4 @@ func (v *Validator) wrapAnyValidate(value any, rules ...validation.Rule) {
 	if err != nil {
 		v.AddValidationError(err)
 	}
-}
-
-func (v *Validator) toInt(s string) (int, bool) {
-	val, err := strconv.Atoi(s)
-	if err != nil {
-		v.AddArgumentError(err)
-		return 0, false
-	}
-	return val, true
 }
