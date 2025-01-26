@@ -484,7 +484,7 @@ func TestValidator_enumValidate(t *testing.T) {
 	}{
 		{"valid1", "bar", "foo,bar,baz", ""},
 		{"valid2", "foo", "foo", ""},
-		{"invalid", "invalid", "foo,bar,baz", "must specify [foo bar baz]"},
+		{"invalid", "invalid", "foo,bar,baz", "must be one of [foo bar baz]"},
 	}
 
 	for _, tc := range cases {

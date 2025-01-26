@@ -336,7 +336,7 @@ func (v *Validator) enumValidate() {
 
 	enumerations := strings.Split(v.enum, ",")
 	if !slices.Contains(enumerations, v.Value.Unmasked()) {
-		v.AddValidationError(fmt.Errorf("must specify %v", enumerations))
+		v.AddValidationError(fmt.Errorf("must be one of %v", enumerations))
 	}
 }
 
@@ -363,7 +363,7 @@ func (v *Validator) timestampValidate() {
 		for key, _ := range layouts {
 			keys = append(keys, key)
 		}
-		message := fmt.Sprintf("--timestamp must specify %v", keys)
+		message := fmt.Sprintf("--timestamp must be one of %v", keys)
 		v.AddArgumentError(fmt.Errorf(message))
 	}
 }
