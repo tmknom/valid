@@ -50,7 +50,8 @@ func (a *App) Run(ctx context.Context, args []string) error {
 
 	// setup flags
 	validator := newValidator()
-	a.rootCmd.Flags().StringVar(&validator.value, "value", "", "the value to validate")
+	a.rootCmd.Flags().StringVar(&validator.Value.raw, "value", "", "the value to validate")
+	a.rootCmd.Flags().BoolVar(&validator.Value.mask, "mask-value", false, "masks the value in output to protect sensitive data")
 	a.rootCmd.Flags().StringVar(&validator.min, "min", "", "validates if the value is greater than or equal to the specified minimum")
 	a.rootCmd.Flags().StringVar(&validator.max, "max", "", "validates if the value is less than or equal to the specified maximum")
 	a.rootCmd.Flags().StringVar(&validator.exactLength, "exact-length", "", "validates if the value's length is exactly equal to the specified number")

@@ -13,11 +13,31 @@ import (
 )
 
 func newValidator() *Validator {
-	return &Validator{}
+	return &Validator{
+		Value: &Value{},
+	}
 }
 
+type Value struct {
+	raw  string
+	mask bool
+}
+
+func (v *Value) Unmasked() string {
+	return v.raw
+}
+
+func (v *Value) Masked() string {
+	if v.mask {
+		return MaskedValue
+	}
+	return v.raw
+}
+
+const MaskedValue = "***"
+
 type Validator struct {
-	value string
+	*Value
 	*Errors
 
 	min            string
@@ -48,7 +68,7 @@ type Validator struct {
 }
 
 func (v *Validator) validate() error {
-	v.Errors = &Errors{value: v.value}
+	v.Errors = &Errors{Value: v.Value}
 
 	v.minValidate()
 	v.maxValidate()
@@ -87,7 +107,7 @@ func (v *Validator) minValidate() {
 		return
 	}
 
-	if value, err1 := strconv.ParseInt(v.value, 10, 64); err1 == nil {
+	if value, err1 := strconv.ParseInt(v.Value.Unmasked(), 10, 64); err1 == nil {
 		condition, err2 := strconv.ParseInt(v.min, 10, 64)
 		if err2 != nil {
 			v.AddArgumentError(fmt.Errorf("--min must be an integer number"))
@@ -97,7 +117,7 @@ func (v *Validator) minValidate() {
 		return
 	}
 
-	if value, err1 := strconv.ParseFloat(v.value, 64); err1 == nil {
+	if value, err1 := strconv.ParseFloat(v.Value.Unmasked(), 64); err1 == nil {
 		condition, err2 := strconv.ParseFloat(v.min, 64)
 		if err2 != nil {
 			v.AddArgumentError(fmt.Errorf("--min must be an float number"))
@@ -107,8 +127,7 @@ func (v *Validator) minValidate() {
 		return
 	}
 
-	message := fmt.Sprintf("--min cannot validate \"%s\"", v.value)
-	v.AddArgumentError(fmt.Errorf(message))
+	v.AddArgumentError(fmt.Errorf("--min cannot validate non-numeric value"))
 }
 
 func (v *Validator) maxValidate() {
@@ -116,7 +135,7 @@ func (v *Validator) maxValidate() {
 		return
 	}
 
-	if value, err1 := strconv.ParseInt(v.value, 10, 64); err1 == nil {
+	if value, err1 := strconv.ParseInt(v.Value.Unmasked(), 10, 64); err1 == nil {
 		condition, err2 := strconv.ParseInt(v.max, 10, 64)
 		if err2 != nil {
 			v.AddArgumentError(fmt.Errorf("--max must be an integer number"))
@@ -126,7 +145,7 @@ func (v *Validator) maxValidate() {
 		return
 	}
 
-	if value, err1 := strconv.ParseFloat(v.value, 64); err1 == nil {
+	if value, err1 := strconv.ParseFloat(v.Value.Unmasked(), 64); err1 == nil {
 		condition, err2 := strconv.ParseFloat(v.max, 64)
 		if err2 != nil {
 			v.AddArgumentError(fmt.Errorf("--max must be an float number"))
@@ -135,9 +154,7 @@ func (v *Validator) maxValidate() {
 		v.wrapAnyValidate(value, validation.Max(condition))
 		return
 	}
-
-	message := fmt.Sprintf("--max cannot validate \"%s\"", v.value)
-	v.AddArgumentError(fmt.Errorf(message))
+	v.AddArgumentError(fmt.Errorf("--max cannot validate non-numeric value"))
 }
 
 func (v *Validator) exactLengthValidate() {
@@ -318,7 +335,7 @@ func (v *Validator) enumValidate() {
 	}
 
 	enumerations := strings.Split(v.enum, ",")
-	if !slices.Contains(enumerations, v.value) {
+	if !slices.Contains(enumerations, v.Value.Unmasked()) {
 		v.AddValidationError(fmt.Errorf("must specify %v", enumerations))
 	}
 }
@@ -337,7 +354,7 @@ func (v *Validator) timestampValidate() {
 
 	lowerTimestamp := strings.ToLower(v.timestamp)
 	if layout, ok := layouts[lowerTimestamp]; ok {
-		err := validation.Validate(v.value, validation.Date(layout))
+		err := validation.Validate(v.Value.Unmasked(), validation.Date(layout))
 		if err != nil {
 			v.AddValidationError(fmt.Errorf("must be a valid %s", lowerTimestamp))
 		}
@@ -352,7 +369,7 @@ func (v *Validator) timestampValidate() {
 }
 
 func (v *Validator) wrapValidate(rules ...validation.Rule) {
-	err := validation.Validate(v.value, rules...)
+	err := validation.Validate(v.Value.Unmasked(), rules...)
 	if err != nil {
 		v.AddValidationError(err)
 	}
