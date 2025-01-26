@@ -36,6 +36,7 @@ Flags:
       --int                   validates if the value is an integer
       --json                  validates if the value is valid JSON
       --lower-case            validates if the value contains only lower case unicode letters
+      --mask-value            masks the value in output to protect sensitive data
       --max string            validates if the value is less than or equal to the specified maximum
       --max-length string     validates if the value's length is less than or equal to the specified maximum
       --min string            validates if the value is greater than or equal to the specified minimum

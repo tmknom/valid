@@ -6,9 +6,10 @@ import (
 )
 
 func newValidatorSut(value string) *Validator {
+	v := &Value{raw: value}
 	return &Validator{
-		value:  value,
-		Errors: &Errors{value: value},
+		Value:  v,
+		Errors: &Errors{Value: v},
 	}
 }
 
