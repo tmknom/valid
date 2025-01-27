@@ -32,6 +32,7 @@ Flags:
       --enum string           validates if the value matches any of the specified enumerations
       --exact-length string   validates if the value's length is exactly equal to the specified number
       --float                 validates if the value is a floating-point number
+      --format string         specifies the output format (default, github-actions) (default "default")
   -h, --help                  help for valid
       --int                   validates if the value is an integer
       --json                  validates if the value is valid JSON
