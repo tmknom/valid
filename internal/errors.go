@@ -6,9 +6,14 @@ import (
 )
 
 type Errors struct {
-	MaskedValue string
+	value       InvalidValue
 	validations []error
 	arguments   []error
+}
+
+type InvalidValue interface {
+	Masked() string
+	Name() string
 }
 
 func (e *Errors) AddValidationError(err error) {
@@ -52,8 +57,9 @@ func (e *Errors) joinValidationError() string {
 	for _, err := range e.validations {
 		issues = append(issues, err.Error())
 	}
-	message := fmt.Sprintf("Validation error: The specified value \"%s\" is invalid. Issues: %s", e.MaskedValue, strings.Join(issues, ", "))
-	return message
+
+	return fmt.Sprintf("Validation error: The specified %s \"%s\" is invalid. Issues: %s",
+		e.value.Name(), e.value.Masked(), strings.Join(issues, ", "))
 }
 
 func (e *Errors) joinArgumentError() string {

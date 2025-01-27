@@ -16,13 +16,21 @@ type Orchestrator struct {
 
 func (o *Orchestrator) orchestrate() error {
 	o.Validator.UnmaskedValue = o.Value.Unmasked()
-	o.Validator.Errors.MaskedValue = o.Value.Masked()
+	o.Validator.Errors.value = o.Value
 	return o.Formatter.Format(o.Validator.validate())
 }
 
 type Value struct {
 	raw  string
+	name string
 	mask bool
+}
+
+func (v *Value) Name() string {
+	if len(v.name) == 0 {
+		return DefaultValueName
+	}
+	return v.name
 }
 
 func (v *Value) Unmasked() string {
@@ -36,4 +44,5 @@ func (v *Value) Masked() string {
 	return v.raw
 }
 
+const DefaultValueName = "value"
 const MaskedValue = "***"

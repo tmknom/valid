@@ -9,7 +9,7 @@ func newValidatorSut(value string) *Validator {
 	v := &Value{raw: value}
 	return &Validator{
 		UnmaskedValue: v.Unmasked(),
-		Errors:        &Errors{MaskedValue: v.Masked()},
+		Errors:        &Errors{value: v},
 	}
 }
 

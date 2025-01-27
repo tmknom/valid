@@ -52,6 +52,7 @@ func (a *App) Run(ctx context.Context, args []string) error {
 	// setup flags
 	orchestrator := newOrchestrator()
 	a.rootCmd.Flags().StringVar(&orchestrator.Value.raw, "value", "", "the value to validate")
+	a.rootCmd.Flags().StringVar(&orchestrator.Value.name, "value-name", "", "the name of the value to include in error messages")
 	a.rootCmd.Flags().BoolVar(&orchestrator.Value.mask, "mask-value", false, "masks the value in output to protect sensitive data")
 	a.rootCmd.Flags().StringVar(&orchestrator.Formatter.format, "format", "default", "specifies the output format (default, github-actions)")
 	a.rootCmd.Flags().StringVar(&orchestrator.Validator.min, "min", "", "validates if the value is greater than or equal to the specified minimum")

@@ -48,8 +48,8 @@ func TestApp_Run_Invalid(t *testing.T) {
 		},
 		{
 			annotation: "complex_error",
-			args:       []string{"--mask-value", "--format", "github-actions", "--exact-length", "abc", "--digit", "--upper-case", "--value", "123a"},
-			expected:   "::error::Validation error: The specified value \"***\" is invalid. Issues: must contain digits only, must be in upper case; Argument error: --exact-length must be an integer number",
+			args:       []string{"--value-name", "test-id", "--mask-value", "--format", "github-actions", "--exact-length", "abc", "--digit", "--upper-case", "--value", "123a"},
+			expected:   "::error::Validation error: The specified test-id \"***\" is invalid. Issues: must contain digits only, must be in upper case; Argument error: --exact-length must be an integer number",
 		},
 	}
 
