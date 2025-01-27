@@ -4,18 +4,20 @@ func newOrchestrator() *Orchestrator {
 	return &Orchestrator{
 		Value:     &Value{},
 		Validator: &Validator{Errors: &Errors{}},
+		Formatter: &Formatter{},
 	}
 }
 
 type Orchestrator struct {
 	*Value
 	*Validator
+	*Formatter
 }
 
 func (o *Orchestrator) orchestrate() error {
 	o.Validator.UnmaskedValue = o.Value.Unmasked()
 	o.Validator.Errors.MaskedValue = o.Value.Masked()
-	return o.Validator.validate()
+	return o.Formatter.Format(o.Validator.validate())
 }
 
 type Value struct {

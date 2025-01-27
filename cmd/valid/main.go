@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"log"
 	"os"
 
 	"github.com/tmknom/valid/internal"
@@ -21,7 +20,8 @@ var (
 
 func main() {
 	if err := run(); err != nil {
-		log.Fatalf("%+v", err)
+		_, _ = fmt.Fprint(os.Stderr, err.Error())
+		os.Exit(1)
 	}
 }
 

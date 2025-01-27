@@ -23,8 +23,9 @@ func TestApp_Run_Valid(t *testing.T) {
 		sut := NewApp(FakeTestIO())
 		err := sut.Run(context.Background(), tc.args)
 
+		format := "\n expected: %s\n actual:   %s\n args:     %v"
 		if err != nil {
-			t.Errorf(messageWithArgs(NoError, err, tc.args))
+			t.Errorf(fmt.Sprintf(format, NoError, err, tc.args))
 		}
 	}
 }
@@ -38,22 +39,17 @@ func TestApp_Run_Invalid(t *testing.T) {
 		{
 			annotation: "validation_error",
 			args:       []string{"--exact-length", "5", "--digit", "--value", "123a"},
-			expected:   "Validation error: The value \"123a\" is invalid. Issues: the length must be exactly 5, must contain digits only",
+			expected:   "Error: Validation error: The value \"123a\" is invalid. Issues: the length must be exactly 5, must contain digits only",
 		},
 		{
 			annotation: "argument_error",
 			args:       []string{"--min", "5", "--exact-length", "abc", "--alphanumeric", "--value", "123a"},
-			expected:   "Argument error: --min cannot validate non-numeric value, --exact-length must be an integer number",
+			expected:   "Error: Argument error: --min cannot validate non-numeric value, --exact-length must be an integer number",
 		},
 		{
-			annotation: "validation_and_argument_error",
-			args:       []string{"--exact-length", "abc", "--digit", "--value", "123a"},
-			expected:   "Validation error: The value \"123a\" is invalid. Issues: must contain digits only; Argument error: --exact-length must be an integer number",
-		},
-		{
-			annotation: "mask_with_validation_error",
-			args:       []string{"--mask-value", "--exact-length", "5", "--digit", "--value", "123a"},
-			expected:   "Validation error: The value \"***\" is invalid. Issues: the length must be exactly 5, must contain digits only",
+			annotation: "complex_error",
+			args:       []string{"--mask-value", "--format", "github-actions", "--exact-length", "abc", "--digit", "--upper-case", "--value", "123a"},
+			expected:   "::error::Validation error: The value \"***\" is invalid. Issues: must contain digits only, must be in upper case; Argument error: --exact-length must be an integer number",
 		},
 	}
 
@@ -61,16 +57,13 @@ func TestApp_Run_Invalid(t *testing.T) {
 		sut := NewApp(FakeTestIO())
 		err := sut.Run(context.Background(), tc.args)
 
+		format := "\n expected: %s\n actual:   %s\n args:     %v"
 		if err == nil {
-			t.Errorf(messageWithArgs(tc.expected, NoError, tc.args))
+			t.Errorf(fmt.Sprintf(format, tc.expected, NoError, tc.args))
 		} else if err.Error() != tc.expected {
-			t.Errorf(messageWithArgs(tc.expected, err, tc.args))
+			t.Errorf(fmt.Sprintf(format, tc.expected, err, tc.args))
 		}
 	}
-}
-
-func messageWithArgs(expected string, actual any, args []string) string {
-	return fmt.Sprintf("\n expected: %s\n actual:   %s\n args:     %v", expected, actual, args)
 }
 
 func FakeTestIO() *IO {
