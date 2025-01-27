@@ -8,8 +8,8 @@ import (
 func newValidatorSut(value string) *Validator {
 	v := &Value{raw: value}
 	return &Validator{
-		Value:  v,
-		Errors: &Errors{Value: v},
+		UnmaskedValue: v.Unmasked(),
+		Errors:        &Errors{MaskedValue: v.Masked()},
 	}
 }
 
@@ -539,7 +539,7 @@ func assertNoError(t *testing.T, actual *Errors, value string, argument string) 
 func assertError(t *testing.T, expected string, actual *Errors, value string, argument string) {
 	expectedMessage := fmt.Sprintf("Validation error: The value \"%s\" is invalid. Issues: %s", value, expected)
 	if !actual.HasError() {
-		t.Errorf(formatMessage(expected, NoError, value, argument))
+		t.Errorf(formatMessage(expectedMessage, NoError, value, argument))
 	} else if actual.Error() != expectedMessage {
 		t.Errorf(formatMessage(expectedMessage, actual, value, argument))
 	}

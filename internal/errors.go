@@ -6,7 +6,7 @@ import (
 )
 
 type Errors struct {
-	*Value
+	MaskedValue string
 	validations []error
 	arguments   []error
 }
@@ -52,7 +52,7 @@ func (e *Errors) joinValidationError() string {
 	for _, err := range e.validations {
 		issues = append(issues, err.Error())
 	}
-	message := fmt.Sprintf("Validation error: The value \"%s\" is invalid. Issues: %s", e.Value.Masked(), strings.Join(issues, ", "))
+	message := fmt.Sprintf("Validation error: The value \"%s\" is invalid. Issues: %s", e.MaskedValue, strings.Join(issues, ", "))
 	return message
 }
 
