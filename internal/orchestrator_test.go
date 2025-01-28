@@ -41,6 +41,28 @@ func TestOrchestrator_orchestrate(t *testing.T) {
 	}
 }
 
+func TestValue_Name(t *testing.T) {
+	cases := []struct {
+		annotation string
+		value      string
+		name       string
+		expected   string
+	}{
+		{"specified", "test-value", "test-id", "test-id"},
+		{"not-specified", "test-value", "", "value"},
+	}
+
+	for _, tc := range cases {
+		sut := &Value{raw: tc.value, name: tc.name}
+		actual := sut.Name()
+
+		format := "\n annotation: %s\n expected:   %s\n actual:     %+v\n value:      %s\n name:       %s"
+		if tc.expected != actual {
+			t.Errorf(fmt.Sprintf(format, tc.annotation, tc.expected, actual, tc.value, tc.name))
+		}
+	}
+}
+
 func TestValue_Unmasked(t *testing.T) {
 	cases := []struct {
 		annotation string

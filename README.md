@@ -51,6 +51,7 @@ Flags:
       --url                   validates if the value is a valid URL
       --uuid                  validates if the value is a valid UUID
       --value string          the value to validate
+      --value-name string     the name of the value to include in error messages
   -v, --version               version for valid
 ```
 
