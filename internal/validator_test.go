@@ -537,7 +537,7 @@ func assertNoError(t *testing.T, actual *Errors, value string, argument string) 
 }
 
 func assertError(t *testing.T, expected string, actual *Errors, value string, argument string) {
-	expectedMessage := fmt.Sprintf("Validation error: The value \"%s\" is invalid. Issues: %s", value, expected)
+	expectedMessage := fmt.Sprintf("Validation error: The specified value \"%s\" is invalid. Issues: %s", value, expected)
 	if !actual.HasError() {
 		t.Errorf(formatMessage(expectedMessage, NoError, value, argument))
 	} else if actual.Error() != expectedMessage {

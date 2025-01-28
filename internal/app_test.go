@@ -39,7 +39,7 @@ func TestApp_Run_Invalid(t *testing.T) {
 		{
 			annotation: "validation_error",
 			args:       []string{"--exact-length", "5", "--digit", "--value", "123a"},
-			expected:   "Error: Validation error: The value \"123a\" is invalid. Issues: the length must be exactly 5, must contain digits only",
+			expected:   "Error: Validation error: The specified value \"123a\" is invalid. Issues: the length must be exactly 5, must contain digits only",
 		},
 		{
 			annotation: "argument_error",
@@ -49,7 +49,7 @@ func TestApp_Run_Invalid(t *testing.T) {
 		{
 			annotation: "complex_error",
 			args:       []string{"--mask-value", "--format", "github-actions", "--exact-length", "abc", "--digit", "--upper-case", "--value", "123a"},
-			expected:   "::error::Validation error: The value \"***\" is invalid. Issues: must contain digits only, must be in upper case; Argument error: --exact-length must be an integer number",
+			expected:   "::error::Validation error: The specified value \"***\" is invalid. Issues: must contain digits only, must be in upper case; Argument error: --exact-length must be an integer number",
 		},
 	}
 

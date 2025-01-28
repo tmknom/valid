@@ -14,8 +14,8 @@ func TestOrchestrator_orchestrate(t *testing.T) {
 	}{
 		{"valid-masked", "valid-masked", true, ""},
 		{"valid-unmasked", "valid-unmasked", false, ""},
-		{"invalid-masked", "InvalidMasked", true, "Error: Validation error: The value \"***\" is invalid. Issues: must be in lower case"},
-		{"invalid-unmasked", "InvalidUnmasked", false, "Error: Validation error: The value \"InvalidUnmasked\" is invalid. Issues: must be in lower case"},
+		{"invalid-masked", "InvalidMasked", true, "Error: Validation error: The specified value \"***\" is invalid. Issues: must be in lower case"},
+		{"invalid-unmasked", "InvalidUnmasked", false, "Error: Validation error: The specified value \"InvalidUnmasked\" is invalid. Issues: must be in lower case"},
 	}
 
 	for _, tc := range cases {

@@ -52,7 +52,7 @@ func (e *Errors) joinValidationError() string {
 	for _, err := range e.validations {
 		issues = append(issues, err.Error())
 	}
-	message := fmt.Sprintf("Validation error: The value \"%s\" is invalid. Issues: %s", e.MaskedValue, strings.Join(issues, ", "))
+	message := fmt.Sprintf("Validation error: The specified value \"%s\" is invalid. Issues: %s", e.MaskedValue, strings.Join(issues, ", "))
 	return message
 }
 
