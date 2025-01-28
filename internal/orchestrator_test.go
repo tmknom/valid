@@ -35,8 +35,8 @@ func TestOrchestrator_Orchestrate_NamedValue(t *testing.T) {
 		name       string
 		expected   string
 	}{
-		{"specified-name", "Invalid", "test-id", "Error: Validation error: The specified test-id \"Invalid\" is invalid. Issues: must be in lower case"},
-		{"not-specified-name", "Invalid", "", "Error: Validation error: The specified value \"Invalid\" is invalid. Issues: must be in lower case"},
+		{"specified-name", "Invalid", "test-id", "Error: Validation error: The specified test-id \"Invalid\" is invalid. Issues: must be in lower case."},
+		{"not-specified-name", "Invalid", "", "Error: Validation error: The specified value \"Invalid\" is invalid. Issues: must be in lower case."},
 	}
 
 	for _, tc := range cases {
@@ -63,8 +63,8 @@ func TestOrchestrator_Orchestrate_MaskedValue(t *testing.T) {
 		mask       bool
 		expected   string
 	}{
-		{"masked", "Invalid", true, "Error: Validation error: The specified value \"***\" is invalid. Issues: must be in lower case"},
-		{"unmasked", "Invalid", false, "Error: Validation error: The specified value \"Invalid\" is invalid. Issues: must be in lower case"},
+		{"masked", "Invalid", true, "Error: Validation error: The specified value \"***\" is invalid. Issues: must be in lower case."},
+		{"unmasked", "Invalid", false, "Error: Validation error: The specified value \"Invalid\" is invalid. Issues: must be in lower case."},
 	}
 
 	for _, tc := range cases {
@@ -91,8 +91,8 @@ func TestOrchestrator_Orchestrate_Format(t *testing.T) {
 		format     string
 		expected   string
 	}{
-		{"default", "Invalid", "default", "Error: Validation error: The specified value \"Invalid\" is invalid. Issues: must be in lower case"},
-		{"github-actions", "Invalid", "github-actions", "::error::Validation error: The specified value \"Invalid\" is invalid. Issues: must be in lower case"},
+		{"default", "Invalid", "default", "Error: Validation error: The specified value \"Invalid\" is invalid. Issues: must be in lower case."},
+		{"github-actions", "Invalid", "github-actions", "::error::Validation error: The specified value \"Invalid\" is invalid. Issues: must be in lower case."},
 	}
 
 	for _, tc := range cases {

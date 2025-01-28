@@ -38,11 +38,11 @@ func (e *Errors) hasArguments() bool {
 
 func (e *Errors) Error() string {
 	if e.hasValidations() && e.hasArguments() {
-		return strings.Join([]string{e.joinValidationError(), e.joinArgumentError()}, "; ")
+		return strings.Join([]string{e.joinValidationError(), e.joinArgumentError()}, "; ") + Period
 	} else if e.hasValidations() {
-		return e.joinValidationError()
+		return e.joinValidationError() + Period
 	} else if e.hasArguments() {
-		return e.joinArgumentError()
+		return e.joinArgumentError() + Period
 	} else {
 		return ""
 	}
@@ -73,3 +73,5 @@ func (e *Errors) joinArgumentError() string {
 	}
 	return "Argument error: " + strings.Join(issues, ", ")
 }
+
+const Period = "."

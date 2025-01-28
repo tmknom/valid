@@ -39,17 +39,17 @@ func TestApp_Run_Invalid(t *testing.T) {
 		{
 			annotation: "validation_error",
 			args:       []string{"--exact-length", "5", "--digit", "--value", "123a"},
-			expected:   "Error: Validation error: The specified value \"123a\" is invalid. Issues: the length must be exactly 5, must contain digits only",
+			expected:   "Error: Validation error: The specified value \"123a\" is invalid. Issues: the length must be exactly 5, must contain digits only.",
 		},
 		{
 			annotation: "argument_error",
 			args:       []string{"--min", "5", "--exact-length", "abc", "--alphanumeric", "--value", "123a"},
-			expected:   "Error: Argument error: --min cannot validate non-numeric value, --exact-length must be an integer number",
+			expected:   "Error: Argument error: --min cannot validate non-numeric value, --exact-length must be an integer number.",
 		},
 		{
 			annotation: "complex_error",
 			args:       []string{"--value-name", "test-id", "--mask-value", "--format", "github-actions", "--exact-length", "abc", "--digit", "--upper-case", "--value", "123a"},
-			expected:   "::error::Validation error: The specified test-id \"***\" is invalid. Issues: must contain digits only, must be in upper case; Argument error: --exact-length must be an integer number",
+			expected:   "::error::Validation error: The specified test-id \"***\" is invalid. Issues: must contain digits only, must be in upper case; Argument error: --exact-length must be an integer number.",
 		},
 	}
 
