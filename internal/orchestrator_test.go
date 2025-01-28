@@ -19,7 +19,7 @@ func TestOrchestrator_Orchestrate_Valid(t *testing.T) {
 			Validator: &Validator{Errors: &Errors{}, lowerCase: true},
 			Formatter: &Formatter{},
 		}
-		err := sut.orchestrate()
+		err := sut.Orchestrate()
 
 		format := "\n annotation: %s\n expected:   %s\n actual:     %+v\n value:      %s"
 		if err != nil {
@@ -45,7 +45,7 @@ func TestOrchestrator_Orchestrate_NamedValue(t *testing.T) {
 			Validator: &Validator{Errors: &Errors{}, lowerCase: true},
 			Formatter: &Formatter{},
 		}
-		err := sut.orchestrate()
+		err := sut.Orchestrate()
 
 		format := "\n annotation: %s\n expected:   %s\n actual:     %+v\n value:      %s\n name:       %v"
 		if err == nil {
@@ -73,7 +73,7 @@ func TestOrchestrator_Orchestrate_MaskedValue(t *testing.T) {
 			Validator: &Validator{Errors: &Errors{}, lowerCase: true},
 			Formatter: &Formatter{},
 		}
-		err := sut.orchestrate()
+		err := sut.Orchestrate()
 
 		format := "\n annotation: %s\n expected:   %s\n actual:     %+v\n value:      %s\n mask:       %v"
 		if err == nil {
@@ -101,7 +101,7 @@ func TestOrchestrator_Orchestrate_Format(t *testing.T) {
 			Validator: &Validator{Errors: &Errors{}, lowerCase: true},
 			Formatter: &Formatter{format: tc.format},
 		}
-		err := sut.orchestrate()
+		err := sut.Orchestrate()
 
 		format := "\n annotation: %s\n expected:   %s\n actual:     %+v\n value:      %s\n format:     %v"
 		if err == nil {

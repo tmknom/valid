@@ -81,7 +81,7 @@ func (a *App) Run(ctx context.Context, args []string) error {
 	a.rootCmd.Flags().StringVar(&orchestrator.Validator.enum, "enum", "", "validates if the value matches any of the specified enumerations")
 	a.rootCmd.Flags().StringVar(&orchestrator.Validator.timestamp, "timestamp", "", "validates if the value matches a timestamp format [rfc3339, datetime, date, time]")
 
-	a.rootCmd.RunE = func(cmd *cobra.Command, args []string) error { return orchestrator.orchestrate() }
+	a.rootCmd.RunE = func(cmd *cobra.Command, args []string) error { return orchestrator.Orchestrate() }
 	return a.rootCmd.Execute()
 }
 
