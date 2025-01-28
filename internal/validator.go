@@ -43,7 +43,7 @@ type Validator struct {
 	timestamp      string
 }
 
-func (v *Validator) validate() error {
+func (v *Validator) Validate() error {
 	v.minValidate()
 	v.maxValidate()
 	v.exactLengthValidate()

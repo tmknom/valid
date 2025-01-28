@@ -14,8 +14,8 @@ type Orchestrator struct {
 	*Formatter
 }
 
-func (o *Orchestrator) orchestrate() error {
+func (o *Orchestrator) Orchestrate() error {
 	o.Validator.UnmaskedValue = o.Value.Unmasked()
 	o.Validator.Errors.value = o.Value
-	return o.Formatter.Format(o.Validator.validate())
+	return o.Formatter.Format(o.Validator.Validate())
 }
