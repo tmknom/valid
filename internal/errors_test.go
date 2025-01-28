@@ -42,11 +42,11 @@ func TestErrors_Error(t *testing.T) {
 		arguments   []string
 		expected    string
 	}{
-		{"one-validation-error", []string{"one"}, nil, "Validation error: The specified value \"pseudo\" is invalid. Issues: one"},
-		{"multi-validation-error", []string{"one", "two"}, nil, "Validation error: The specified value \"pseudo\" is invalid. Issues: one, two"},
-		{"one-argument-error", nil, []string{"one"}, "Argument error: one"},
-		{"multi-argument-error", nil, []string{"one", "two"}, "Argument error: one, two"},
-		{"complex-error", []string{"one", "two"}, []string{"three", "four"}, "Validation error: The specified value \"pseudo\" is invalid. Issues: one, two; Argument error: three, four"},
+		{"one-validation-error", []string{"one"}, nil, "Validation error: The specified value \"pseudo\" is invalid. Issues: one."},
+		{"multi-validation-error", []string{"one", "two"}, nil, "Validation error: The specified value \"pseudo\" is invalid. Issues: one, two."},
+		{"one-argument-error", nil, []string{"one"}, "Argument error: one."},
+		{"multi-argument-error", nil, []string{"one", "two"}, "Argument error: one, two."},
+		{"complex-error", []string{"one", "two"}, []string{"three", "four"}, "Validation error: The specified value \"pseudo\" is invalid. Issues: one, two; Argument error: three, four."},
 		{"no-error", nil, nil, ""},
 	}
 
